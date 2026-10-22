@@ -7,6 +7,18 @@ Guía interactiva didáctica y visual sobre el ciclo de vida de Git, transporte 
 
 ---
 
+## Documentacion Tecnica
+
+Encuentra toda la documentacion arquitectonica y funcional en la carpeta [`docs/`](./docs/):
+
+- [Indice de Documentacion](./docs/README.md)
+- [Arquitectura del Sistema & Clean Architecture](./docs/ARCHITECTURE.md)
+- [Guia Detallada de los 9 Modulos & Simuladores](./docs/MODULES_GUIDE.md)
+- [Guia de Despliegue & CI/CD en GitHub Pages](./docs/DEPLOYMENT_AND_CI_CD.md)
+- [Estandares de Contribucion & Codigo](./docs/CONTRIBUTING.md)
+
+---
+
 ## Modulos y Caracteristicas
 
 1. **Pipeline Interactivo de Transporte de Cambios**:
