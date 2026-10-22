@@ -44,8 +44,10 @@ export function showToast(message: string, duration = 2200): void {
 
   toastText.textContent = message;
   toast.hidden = false;
+  toast.classList.add('visible');
 
   toastTimeoutId = window.setTimeout(() => {
+    toast.classList.remove('visible');
     toast.hidden = true;
     toastTimeoutId = undefined;
   }, duration);
