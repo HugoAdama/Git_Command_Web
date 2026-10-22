@@ -15,6 +15,7 @@ export { default as InteractiveTerminal } from './InteractiveTerminal.astro';
 export { default as BranchVisualizer } from './BranchVisualizer.astro';
 export { default as ConflictResolver } from './ConflictResolver.astro';
 export { default as GitBisectSimulator } from './GitBisectSimulator.astro';
+export { default as GitRebasePlayground } from './GitRebasePlayground.astro';
 export { default as CommandBuilder } from './CommandBuilder.astro';
 export { default as ConventionalCommitBuilder } from './ConventionalCommitBuilder.astro';
 export { default as GitignoreBuilder } from './GitignoreBuilder.astro';

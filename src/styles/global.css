@@ -299,14 +299,21 @@ button:active:not(:disabled) {
 
 /* Print Stylesheet for A4 Cheat Sheet */
 @media print {
+  @page {
+    margin: 1.2cm;
+    size: A4 portrait;
+  }
+
   body {
     background: #ffffff !important;
     color: #111827 !important;
-    font-size: 11pt;
+    font-size: 10pt;
+    line-height: 1.4;
   }
 
   .ambient-glow,
   .ambient-glow-bottom,
+  .hub-navigation,
   .nav-sections,
   .theme-btn,
   .copy-btn,
@@ -316,13 +323,34 @@ button:active:not(:disabled) {
   .quiz-reset-btn,
   .download-btn,
   .search-wrapper,
+  .scroll-progress-bar,
+  .scroll-top-btn,
   .print-hide {
     display: none !important;
+  }
+
+  .hub-view-container[hidden] {
+    display: block !important;
   }
 
   .container {
     max-width: 100% !important;
     padding: 0 !important;
+  }
+
+  .site-header {
+    padding: 0 0 1rem !important;
+    border-bottom: 2px solid #000000;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-visual-card {
+    display: none !important;
+  }
+
+  .hero-title {
+    font-size: 18pt !important;
+    color: #000000 !important;
   }
 
   .pipeline-container,
@@ -331,24 +359,28 @@ button:active:not(:disabled) {
   .workflow-card,
   .compare-panel-card,
   .builder-card,
+  .rebase-card,
   .glossary-card {
     background: #ffffff !important;
-    border: 1px solid #d1d5db !important;
+    border: 1px solid #94a3b8 !important;
     box-shadow: none !important;
     page-break-inside: avoid;
-    margin-bottom: 1.5rem !important;
+    margin-bottom: 1.25rem !important;
+    padding: 1rem !important;
   }
 
   .command-card {
-    background: #f9fafb !important;
-    border: 1px solid #e5e7eb !important;
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
     box-shadow: none !important;
     page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .command-code {
-    color: #1f2937 !important;
+    color: #0f172a !important;
     font-weight: 700 !important;
+    font-size: 9.5pt !important;
   }
 
   .prompt-symbol {

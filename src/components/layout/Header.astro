@@ -37,6 +37,20 @@ const brandHref = isEn ? `${baseUrl}en` : baseUrl;
         <span class="pill-arrow">→</span>
         <span class="pill pill-push">push</span>
       </div>
+      <button
+        id="print-cheatsheet-btn"
+        class="print-btn print-hide"
+        type="button"
+        aria-label={isEn ? "Print / Save PDF Cheatsheet" : "Imprimir / Guardar Hoja de Referencia PDF"}
+        title={isEn ? "Print or export quick reference cheatsheet as PDF" : "Imprimir o exportar hoja de referencia rápida en PDF"}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span class="print-btn-text">PDF</span>
+      </button>
       <LanguageToggle currentLang={lang} />
       <ThemeToggle />
     </div>
@@ -328,12 +342,46 @@ const brandHref = isEn ? `${baseUrl}en` : baseUrl;
     }
   }
 
+  .print-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border-radius: 0.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-medium);
+    color: var(--text-main);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .print-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
   @media (max-width: 640px) {
     .legend-pills {
       display: none;
     }
     .site-header {
       padding: 1.5rem 0 1rem;
+    }
+    .print-btn-text {
+      display: none;
+    }
+    .print-btn {
+      width: 2.5rem;
+      padding: 0;
+      justify-content: center;
     }
   }
 
@@ -353,3 +401,27 @@ const brandHref = isEn ? `${baseUrl}en` : baseUrl;
     }
   }
 </style>
+
+<script>
+  const printCheatsheetBtn = document.getElementById('print-cheatsheet-btn');
+  if (printCheatsheetBtn) {
+    printCheatsheetBtn.addEventListener('click', () => {
+      // If user is in tabbed view, unhide all views temporarily so print covers the whole cheatsheet
+      const hiddenViews = Array.from(document.querySelectorAll('.hub-view-container[hidden]'));
+      hiddenViews.forEach(v => v.removeAttribute('hidden'));
+      window.print();
+      // Restore views after print dialog opens
+      setTimeout(() => {
+        const activeTab = document.querySelector('.hub-tab-btn.active');
+        const activeViewId = activeTab?.getAttribute('data-view');
+        if (activeViewId && !document.body.classList.contains('continuous-view-active')) {
+          document.querySelectorAll('.hub-view-container').forEach(c => {
+            if (c.getAttribute('data-view-id') !== activeViewId) {
+              c.setAttribute('hidden', '');
+            }
+          });
+        }
+      }, 500);
+    });
+  }
+</script>

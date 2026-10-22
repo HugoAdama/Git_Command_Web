@@ -38,6 +38,14 @@ const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
 
+    <!-- PWA & Mobile Web App Capabilities -->
+    <link rel="manifest" href={`${baseUrl}manifest.webmanifest`} />
+    <meta name="theme-color" content="#070b14" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Git Command Web" />
+    <link rel="apple-touch-icon" href={`${baseUrl}favicon.svg`} />
+
     <!-- Prevent FOUC for theme toggle -->
     <script is:inline>
       (function() {
@@ -102,6 +110,14 @@ const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 
         scrollBtn.addEventListener('click', () => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      // Register PWA Service Worker
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        window.addEventListener('load', () => {
+          const swPath = `${document.querySelector('link[rel="manifest"]')?.getAttribute('href')?.replace('manifest.webmanifest', 'sw.js') || 'sw.js'}`;
+          navigator.serviceWorker.register(swPath).catch(() => {});
         });
       }
     </script>

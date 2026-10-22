@@ -85,7 +85,20 @@ Este documento describe a nivel tecnico y funcional cada uno de los componentes 
 
 ---
 
-## 6. Estacion de Rescate Git SOS
+## 6. Playground de Rebase Interactivo (`git rebase -i`)
+* **Componente**: `src/components/GitRebasePlayground.astro`
+* **Proposito**: Enseñar visualmente cómo reordenar, fusionar (squash / fixup), editar (reword) y descartar (drop) commits.
+* **Mecanica**:
+  * Simulación fiel del buffer `git-rebase-todo` de `git rebase -i HEAD~4`.
+  * Controles interactivos de reordenamiento hacia arriba y hacia abajo (`↑` / `↓`).
+  * Menú desplegable de comandos de rebase por cada commit (`pick`, `reword`, `squash`, `fixup`, `drop`).
+  * Previsualizador en tiempo real del script `.git/rebase-merge/git-rebase-todo`.
+  * Botón de ejecución simulada con motor algorítmico que recalcula los hashes SHA-1 resultantes y genera la comparación gráfica antes/después del historial.
+  * Regla de oro visual de advertencia: nunca reescribir historia en ramas compartidas o públicas.
+
+---
+
+## 7. Estacion de Rescate Git SOS
 * **Componente**: `src/components/GitRescueSection.astro`
 * **Proposito**: Proveer una red de seguridad paso a paso cuando se comete un error grave.
 * **Mecanica**:
@@ -94,7 +107,7 @@ Este documento describe a nivel tecnico y funcional cada uno de los componentes 
 
 ---
 
-## 7. Flujos de Trabajo en Equipo
+## 8. Flujos de Trabajo en Equipo
 * **Componente**: `src/components/WorkflowsSection.astro`
 * **Proposito**: Enseñar las metodologias estandar de la industria de software.
 * **Mecanica**:
@@ -105,7 +118,7 @@ Este documento describe a nivel tecnico y funcional cada uno de los componentes 
 
 ---
 
-## 8. Comparativas Frente a Frente
+## 9. Comparativas Frente a Frente
 * **Componente**: `src/components/ComparisonsSection.astro`
 * **Proposito**: Resolver dudas frecuentes de desarrolladores sobre comandos con nombres similares.
 * **Mecanica**:
@@ -118,7 +131,7 @@ Este documento describe a nivel tecnico y funcional cada uno de los componentes 
 
 ---
 
-## 9. Generadores Visuales
+## 10. Generadores Visuales
 * **Componentes**:
   * `src/components/ConventionalCommitBuilder.astro`: Generador interactivo de mensajes siguiendo la especificacion Conventional Commits (`feat`, `fix`, `docs`, `refactor`, `chore`, `perf`, `test`) con seleccion de scope y checkbox de *Breaking Change*.
   * `src/components/CommandBuilder.astro`: Asistente para construccion de comandos de ramas y tags.
@@ -126,7 +139,7 @@ Este documento describe a nivel tecnico y funcional cada uno de los componentes 
 
 ---
 
-## 10. Boveda de Aliases y ~/.gitconfig Pro
+## 11. Boveda de Aliases y ~/.gitconfig Pro
 * **Componente**: `src/components/GitAliasesVault.astro`
 * **Proposito**: Optimizar la velocidad de tipeo en terminal con configuraciones globales de alto rendimiento.
 * **Mecanica**:
@@ -136,7 +149,7 @@ Este documento describe a nivel tecnico y funcional cada uno de los componentes 
 
 ---
 
-## 11. Git Hooks Hub
+## 12. Git Hooks Hub
 * **Componente**: `src/components/GitHooksHub.astro`
 * **Proposito**: Explicar la defensa de calidad del codigo antes de que llegue al repositorio.
 * **Mecanica**:
@@ -146,7 +159,7 @@ Este documento describe a nivel tecnico y funcional cada uno de los componentes 
 
 ---
 
-## 12. Arquitectura Interna de Git (DAG y Plomeria)
+## 13. Arquitectura Interna de Git (DAG y Plomeria)
 * **Componente**: `src/components/GitInternals.astro`
 * **Proposito**: Comprender que Git no es magia, sino un grafo aciclico dirigido (DAG) de almacenamiento direccionable por contenido.
 * **Mecanica**:
@@ -159,7 +172,7 @@ Este documento describe a nivel tecnico y funcional cada uno de los componentes 
 
 ---
 
-## 13. Glosario y Autoevaluacion Interactiva (Quiz)
+## 14. Glosario y Autoevaluacion Interactiva (Quiz)
 * **Componentes**:
   * `src/components/GitGlossary.astro`: Diccionario de mas de 20 terminos tecnicos (HEAD, Detached HEAD, Fast-Forward, Cherry-pick, Reflog, Staging, Rebase, etc.) con filtros y comandos clave.
   * `src/components/GitQuiz.astro`: Cuestionario interactivo de 5 preguntas de nivel medio/avanzado con retroalimentacion inmediata, explicacion tecnica detallada de la respuesta correcta y contador dinamico de aciertos.

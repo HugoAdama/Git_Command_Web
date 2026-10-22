@@ -36,18 +36,30 @@ Encuentra toda la documentacion arquitectonica y funcional en la carpeta [`docs/
 4. **Simulador de Git Bisect**:
    - Búsqueda binaria interactiva para rastrear el commit exacto que introdujo un bug.
 
-5. **Bóveda de Aliases y ~/.gitconfig**:
+5. **Playground de Rebase Interactivo (`git rebase -i`)**:
+   - Reordenamiento visual de commits (`↑` / `↓`), fusión con `squash` o `fixup`, edición (`reword`) y eliminación (`drop`) con recalculo dinámico del DAG de hashes SHA-1.
+
+6. **Generadores Didácticos (Conventional Commits & .gitignore)**:
+   - Asistente semántico de mensajes de commit estandarizados y generador modular de exclusiones de archivos.
+
+7. **Bóveda de Aliases y ~/.gitconfig**:
    - Configuración global optimizada para agilizar comandos cotidianos.
    - Generador y visor interactivo de archivo de configuración.
 
-6. **Git Hooks Hub**:
+8. **Git Hooks Hub**:
    - Automatización de defensas de calidad mediante scripts pre-commit, commit-msg y pre-push con Husky.
 
-7. **Arquitectura Interna de Git (DAG)**:
+9. **Arquitectura Interna de Git (DAG)**:
    - Inspector de objetos plomería (`blob`, `tree`, `commit`, `tag`).
 
-8. **Soporte Bilingue Nativo (i18n)**:
-   - Rutas sincronizadas en Español (`/`) e Inglés (`/en`).
+10. **PWA y Modo Offline Completo**:
+   - Instalable como Progressive Web App gracias a Web Manifest y Service Worker inteligente con estrategia de caché en segundo plano.
+
+11. **Modo Cheatsheet Imprimible y Exportación a PDF**:
+   - Botón directo de impresión/guardado en PDF con hoja de referencia limpia optimizada para hojas A4.
+
+12. **Soporte Bilingüe Nativo (i18n)**:
+   - Rutas sincronizadas y simétricas en Español (`/`) e Inglés (`/en`).
 
 ---
 

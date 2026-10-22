@@ -12,6 +12,7 @@ import {
   BranchVisualizer,
   ConflictResolver,
   GitBisectSimulator,
+  GitRebasePlayground,
   GitRescueSection,
   WorkflowsSection,
   ComparisonsSection,
@@ -29,7 +30,7 @@ import {
 
 <Layout
   title="Git Commands | Interactive Educational Guide: How Your Changes Travel"
-  description="Learn Git visually: Interactive 4-stage pipeline, live bash simulator, branch visualizer, conflict resolution, git bisect, pro aliases, git hooks, internal architecture, glossary and quiz."
+  description="Learn Git visually: Interactive 4-stage pipeline, live bash simulator, branch visualizer, conflict resolution, git bisect, interactive rebase, pro aliases, git hooks, internal architecture, glossary and quiz."
   lang="en"
 >
   <Header lang="en" />
@@ -49,12 +50,13 @@ import {
       </section>
     </div>
 
-    <!-- View 2: Visual Simulators (Terminal, Branch Tree, Conflict Resolver & Bisect) -->
+    <!-- View 2: Visual Simulators (Terminal, Branch Tree, Conflict Resolver, Bisect & Rebase) -->
     <div class="hub-view-container" id="view-simuladores" data-view-id="simuladores" hidden>
       <InteractiveTerminal lang="en" />
       <BranchVisualizer lang="en" />
       <ConflictResolver lang="en" />
       <GitBisectSimulator lang="en" />
+      <GitRebasePlayground lang="en" />
     </div>
 
     <!-- View 3: Practical Guides & Emergency Rescue -->
