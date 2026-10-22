@@ -162,15 +162,15 @@ const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 
       .toast {
         position: fixed;
-        bottom: 2.5rem;
+        top: 2rem;
         left: 50%;
         transform: translateX(-50%);
-        background: rgba(10, 16, 30, 0.94);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background: rgba(10, 16, 30, 0.95);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
         color: #f8fafc;
-        border: 1px solid rgba(16, 185, 129, 0.45);
-        padding: 0.65rem 1.4rem;
+        border: 1px solid rgba(16, 185, 129, 0.5);
+        padding: 0.65rem 1.45rem;
         border-radius: 9999px;
         display: inline-flex;
         align-items: center;
@@ -178,9 +178,9 @@ const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
         font-family: var(--font-body);
         font-size: 0.875rem;
         font-weight: 600;
-        box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.65), 0 0 24px -4px rgba(16, 185, 129, 0.4);
-        z-index: 1000;
-        animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.75), 0 0 25px -3px rgba(16, 185, 129, 0.45);
+        z-index: 99999;
+        animation: toastDrop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         pointer-events: none;
         white-space: nowrap;
       }
@@ -189,11 +189,11 @@ const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 1.4rem;
-        height: 1.4rem;
+        width: 1.45rem;
+        height: 1.45rem;
         border-radius: 50%;
-        background: rgba(16, 185, 129, 0.18);
-        border: 1px solid rgba(16, 185, 129, 0.35);
+        background: rgba(16, 185, 129, 0.2);
+        border: 1px solid rgba(16, 185, 129, 0.4);
         color: var(--accent-emerald);
       }
 
@@ -201,10 +201,10 @@ const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
         color: var(--accent-emerald);
       }
 
-      @keyframes toastIn {
+      @keyframes toastDrop {
         from {
           opacity: 0;
-          transform: translate(-50%, 14px) scale(0.92);
+          transform: translate(-50%, -18px) scale(0.92);
         }
         to {
           opacity: 1;
@@ -214,7 +214,7 @@ const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 
       @media (max-width: 640px) {
         .toast {
-          bottom: 2rem;
+          top: 1.25rem;
           max-width: calc(100vw - 2rem);
           white-space: normal;
           text-align: center;

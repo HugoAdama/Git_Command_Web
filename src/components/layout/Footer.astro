@@ -11,65 +11,78 @@ const isEn = lang === 'en';
 <footer class="site-footer">
   <div class="footer-card">
     <div class="footer-columns">
+      <!-- Col 1: Brand & Author attribution -->
       <div class="footer-brand-col">
         <div class="footer-logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-            <line x1="6" y1="3" x2="6" y2="15"></line>
-            <circle cx="18" cy="6" r="3"></circle>
-            <circle cx="6" cy="18" r="3"></circle>
-            <path d="M18 9a9 9 0 0 1-9 9"></path>
-          </svg>
-          <b>Git Flow Cheat Sheet</b>
+          <div class="footer-logo-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="6" y1="3" x2="6" y2="21"></line>
+              <path d="M6 16c4 0 11-1 11-7"></path>
+              <circle cx="6" cy="18" r="2.8" fill="var(--bg-primary)" stroke="var(--accent-cyan)" stroke-width="2.2"></circle>
+              <circle cx="6" cy="6" r="2.8" fill="var(--bg-primary)" stroke="var(--accent-cyan)" stroke-width="2.2"></circle>
+              <circle cx="17" cy="8" r="2.8" fill="var(--bg-primary)" stroke="var(--accent-emerald)" stroke-width="2.2"></circle>
+            </svg>
+          </div>
+          <b class="footer-title">Git Command Web</b>
         </div>
         <p class="footer-tagline">
           {isEn
-            ? 'Fast interactive visual reference for modern software engineers built on Astro 7.'
-            : 'Referencia interactiva rápida para desarrolladores modernos construida sobre Astro 7.'}
+            ? 'Interactive visual reference and mental model guide for modern software engineers.'
+            : 'Referencia visual interactiva y modelo mental para desarrolladores de software.'}
         </p>
+
+        <!-- Prominent Author Attribution Badge -->
+        <div class="author-badge-card">
+          <div class="author-avatar-wrap" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="author-text-meta">
+            <span class="author-label-small">{isEn ? 'Created & Developed by' : 'Creado y Desarrollado por'}</span>
+            <strong class="author-name-highlight">Hugo Adama</strong>
+          </div>
+        </div>
       </div>
 
+      <!-- Col 2: Golden Rule -->
       <div class="footer-tips-col">
-        <h3 class="tips-heading">{isEn ? 'Git Golden Rule' : 'Regla de oro del flujo de Git'}</h3>
+        <h3 class="tips-heading">{isEn ? 'Git Golden Rule' : 'Regla de oro de Git'}</h3>
         <p class="tip-body">
           <svg class="tip-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="9" y1="18" x2="15" y2="18"></line>
-            <line x1="10" y1="22" x2="14" y2="22"></line>
-            <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
           {isEn ? (
-            <>Always run <code>git status</code> and <code>git diff</code> before staging, and verify with <code>git log --oneline</code> before pushing.</>
+            <>Always inspect with <code>git status</code> and <code>git diff</code> before staging, and verify with <code>git log --oneline</code> before pushing.</>
           ) : (
-            <>Siempre ejecuta <code>git status</code> y <code>git diff</code> antes de preparar cambios, y comprueba con <code>git log --oneline</code> antes de hacer push.</>
+            <>Inspecciona siempre con <code>git status</code> y <code>git diff</code> antes de preparar cambios, y verifica con <code>git log --oneline</code> antes de hacer push.</>
           )}
         </p>
       </div>
 
+      <!-- Col 3: Keyboard Shortcuts -->
       <div class="footer-shortcuts-col">
         <h3 class="tips-heading">{isEn ? 'Keyboard Shortcuts' : 'Atajos rápidos'}</h3>
         <ul class="shortcuts-list">
           <li><kbd>/</kbd> {isEn ? 'or' : 'o'} <kbd>Ctrl+K</kbd> <span>{isEn ? 'Quick search' : 'Buscar comando'}</span></li>
           <li><kbd>Tab</kbd> + <kbd>Enter</kbd> <span>{isEn ? 'Navigate & copy' : 'Navegar y copiar'}</span></li>
-          <li><kbd>1</kbd> - <kbd>5</kbd> <span>{isEn ? 'Switch modules' : 'Cambiar de módulo'}</span></li>
+          <li><kbd>1</kbd> - <kbd>5</kbd> <span>{isEn ? 'Switch workspace view' : 'Cambiar de módulo'}</span></li>
         </ul>
       </div>
     </div>
 
+    <!-- Bottom Bar -->
     <div class="footer-bottom">
-      <div class="footer-credits">
+      <div class="footer-meta-left">
         <p class="copyright">
-          © {new Date().getFullYear()} Git Command Web — {isEn ? 'Optimized for' : 'Migrado y optimizado para'} <strong>Astro 7</strong>
+          © {new Date().getFullYear()} Git Command Web — {isEn ? 'Open Source MIT License' : 'Código Abierto Licencia MIT'}
         </p>
-        <div class="author-tag">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <span class="author-label">{isEn ? 'Developed by' : 'Desarrollado por'}</span>
-          <strong class="author-name">Hugo Adama</strong>
-        </div>
       </div>
       <div class="footer-badges">
-        <span class="tech-badge">Astro v7</span>
+        <span class="tech-badge badge-astro">Astro v7</span>
         <span class="tech-badge">Vanilla CSS</span>
         <span class="tech-badge">Bilingual i18n</span>
         <span class="tech-badge">Clean Architecture</span>
@@ -80,77 +93,153 @@ const isEn = lang === 'en';
 
 <style>
   .site-footer {
-    padding: 1rem 0 3.5rem;
+    padding: 2.5rem 0 6.5rem;
   }
 
   .footer-card {
     background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-medium);
     border-radius: 1.25rem;
-    padding: 2rem 1.75rem;
+    padding: 2.25rem 2rem;
+    box-shadow: var(--shadow-md);
   }
 
   .footer-columns {
     display: grid;
-    grid-template-columns: 1.5fr 1.5fr 1fr;
-    gap: 2rem;
-    padding-bottom: 1.75rem;
+    grid-template-columns: 1.6fr 1.4fr 1fr;
+    gap: 2.5rem;
+    padding-bottom: 2rem;
     border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .footer-brand-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
   }
 
   .footer-logo {
     display: flex;
     align-items: center;
     gap: 0.65rem;
-    font-family: var(--font-display);
-    font-size: 1.05rem;
+  }
+
+  .footer-logo-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.6rem;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(168, 85, 247, 0.15));
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--accent-cyan);
-    margin-bottom: 0.5rem;
+    box-shadow: 0 0 15px -3px var(--glow-cyan);
+    flex-shrink: 0;
+  }
+
+  .footer-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
   }
 
   .footer-tagline {
     font-size: 0.85rem;
     color: var(--text-muted);
     line-height: 1.5;
-    max-width: 32ch;
+    max-width: 34ch;
+  }
+
+  /* Author Badge Card */
+  .author-badge-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.5rem 0.85rem;
+    background: rgba(56, 189, 248, 0.06);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 0.75rem;
+    width: fit-content;
+    margin-top: 0.25rem;
+  }
+
+  .author-avatar-wrap {
+    width: 1.85rem;
+    height: 1.85rem;
+    border-radius: 50%;
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .author-text-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .author-label-small {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+
+  .author-name-highlight {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    letter-spacing: 0.01em;
   }
 
   .tips-heading {
     font-family: var(--font-display);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     font-weight: 700;
     color: var(--text-main);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 0.6rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
   }
 
   .tip-body {
     font-size: 0.85rem;
     color: var(--text-muted);
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
   .tip-icon {
     display: inline-block;
     vertical-align: -3px;
     color: var(--accent-gold);
-    margin-right: 0.25rem;
+    margin-right: 0.35rem;
   }
 
   .tip-body code {
     font-family: var(--font-mono);
     color: var(--accent-gold);
     background: rgba(250, 204, 21, 0.1);
+    border: 1px solid rgba(250, 204, 21, 0.2);
     padding: 0.1rem 0.35rem;
     border-radius: 4px;
+    font-size: 0.8rem;
   }
 
   .shortcuts-list {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.6rem;
   }
 
   .shortcuts-list li {
@@ -158,18 +247,19 @@ const isEn = lang === 'en';
     color: var(--text-muted);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.45rem;
   }
 
   kbd {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border-medium);
-    color: var(--text-muted);
+    color: var(--text-main);
     font-family: var(--font-mono);
     font-size: 0.75rem;
     font-weight: 600;
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   .footer-bottom {
@@ -181,42 +271,9 @@ const isEn = lang === 'en';
     gap: 1.25rem;
   }
 
-  .footer-credits {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
   .copyright {
     font-size: 0.825rem;
     color: var(--text-dim);
-  }
-
-  .copyright strong {
-    color: var(--accent-cyan);
-  }
-
-  .author-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.825rem;
-    color: var(--text-muted);
-  }
-
-  .author-tag svg {
-    color: var(--accent-cyan);
-    flex-shrink: 0;
-  }
-
-  .author-label {
-    color: var(--text-dim);
-  }
-
-  .author-name {
-    color: var(--accent-cyan);
-    font-weight: 600;
-    letter-spacing: 0.02em;
   }
 
   .footer-badges {
@@ -228,21 +285,37 @@ const isEn = lang === 'en';
   .tech-badge {
     font-family: var(--font-mono);
     font-size: 0.725rem;
-    padding: 0.2rem 0.5rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 9999px;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border-subtle);
     color: var(--text-dim);
+    transition: border-color 0.2s, color 0.2s;
   }
 
-  @media (max-width: 860px) {
+  .tech-badge:hover {
+    border-color: var(--border-medium);
+    color: var(--text-muted);
+  }
+
+  .badge-astro {
+    border-color: rgba(168, 85, 247, 0.3);
+    color: #c084fc;
+    background: rgba(168, 85, 247, 0.08);
+  }
+
+  @media (max-width: 960px) {
     .footer-columns {
       grid-template-columns: 1fr;
-      gap: 1.5rem;
+      gap: 2rem;
     }
   }
 
   @media (max-width: 640px) {
+    .site-footer {
+      padding: 1.5rem 0 5.5rem;
+    }
+
     .footer-card {
       padding: 1.5rem 1.15rem;
     }
@@ -250,7 +323,7 @@ const isEn = lang === 'en';
     .footer-bottom {
       flex-direction: column;
       align-items: flex-start;
-      gap: 1.25rem;
+      gap: 1rem;
     }
   }
 </style>

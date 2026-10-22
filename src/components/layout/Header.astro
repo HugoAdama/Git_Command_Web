@@ -17,18 +17,16 @@ const brandHref = isEn ? `${baseUrl}en` : baseUrl;
 <header class="site-header">
   <div class="top-bar">
     <a href={brandHref} class="brand" title="Git Command Web">
-      <div class="brand-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="6" y1="3" x2="6" y2="15"></line>
-          <circle cx="18" cy="6" r="3"></circle>
-          <circle cx="6" cy="18" r="3"></circle>
-          <path d="M18 9a9 9 0 0 1-9 9"></path>
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="6" y1="3" x2="6" y2="21"></line>
+          <path d="M6 16c4 0 11-1 11-7"></path>
+          <circle cx="6" cy="18" r="2.8" fill="var(--bg-primary)" stroke="var(--accent-cyan)" stroke-width="2.2"></circle>
+          <circle cx="6" cy="6" r="2.8" fill="var(--bg-primary)" stroke="var(--accent-cyan)" stroke-width="2.2"></circle>
+          <circle cx="17" cy="8" r="2.8" fill="var(--bg-primary)" stroke="var(--accent-emerald)" stroke-width="2.2"></circle>
         </svg>
       </div>
-      <div class="brand-text">
-        <span class="brand-title">Git Command Web</span>
-        <span class="brand-tag">{isEn ? 'Astro 7 Interactive Guide' : 'Guía Interactiva Astro 7'}</span>
-      </div>
+      <span class="brand-title">Git Command Web</span>
     </a>
 
     <div class="header-actions">
