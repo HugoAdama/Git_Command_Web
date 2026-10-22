@@ -754,11 +754,11 @@ const isEn = lang === 'en';
           prev.message += ` + ${c.message}`;
         }
         // Hash recalculates when content changes
-        prev.sha = shaGenerator(prev.sha);
+        prev.sha = shaGenerator();
       } else {
         // Normal pick or reword
         newHistory.push({
-          sha: shaGenerator(c.originalSha),
+          sha: shaGenerator(),
           message: c.message,
           type: c.action
         });
