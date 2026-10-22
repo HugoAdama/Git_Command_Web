@@ -1,0 +1,398 @@
+---
+// GitAliasesVault.astro
+import { gitAliasesEs } from '../data/gitToolsData';
+import { gitAliasesEn } from '../data/en/gitToolsData';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const aliases = isEn ? gitAliasesEn : gitAliasesEs;
+
+const sampleGitConfig = `[init]
+\tdefaultBranch = main
+[pull]
+\trebase = true
+[rerere]
+\tenabled = true
+[core]
+\tautocrlf = input
+[color]
+\tui = auto
+[help]
+\tautocorrect = 1
+
+[alias]
+\tst = status -sb
+\tlg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+\tundo = reset --soft HEAD~1
+\tunstage = restore --staged
+\tamend = commit --amend --no-edit
+\tbr = branch -vv
+\tcleanup = !git branch --merged | grep -v "\\\\*" | xargs -n 1 git branch -d
+\twip = !git add -A && git commit -m "chore: work in progress [skip ci]"`;
+---
+
+<section id="seccion-aliases" class="aliases-section" aria-label={isEn ? "Git aliases and productivity vault" : "Bóveda de aliases y productividad de Git"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-vault">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+      </svg>
+      <span>{isEn ? 'Supercharged Terminal' : 'Terminal Turbo'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Productivity Aliases & .gitconfig Vault' : 'Bóveda de Aliases y Productividad Pro'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Senior developers do not retype repetitive commands. Configure high-speed aliases and battle-tested global flags directly in your ~/.gitconfig.'
+        : 'Los desarrolladores senior no teclean comandos largos una y otra vez. Configura atajos de alta velocidad y banderas recomendadas directamente en tu ~/.gitconfig.'}
+    </p>
+  </div>
+
+  <div class="vault-container">
+    <!-- Left: Aliases Grid & Filter -->
+    <div class="aliases-column">
+      <div class="aliases-filter-bar" role="tablist" aria-label={isEn ? "Filter aliases" : "Filtrar aliases"}>
+        <button type="button" class="alias-filter-btn active" data-cat="todos">
+          <span>{isEn ? 'All' : 'Todos'}</span>
+          <span class="count-tag">{aliases.length}</span>
+        </button>
+        <button type="button" class="alias-filter-btn" data-cat="historial">
+          <span>{isEn ? 'History' : 'Historial'}</span>
+        </button>
+        <button type="button" class="alias-filter-btn" data-cat="estado">
+          <span>{isEn ? 'State' : 'Estado'}</span>
+        </button>
+        <button type="button" class="alias-filter-btn" data-cat="deshacer">
+          <span>{isEn ? 'Undo' : 'Deshacer'}</span>
+        </button>
+        <button type="button" class="alias-filter-btn" data-cat="ramas">
+          <span>{isEn ? 'Branches' : 'Ramas'}</span>
+        </button>
+      </div>
+
+      <div class="aliases-grid">
+        {aliases.map((item) => (
+          <article class="alias-card" data-cat={item.category}>
+            <div class="alias-card-header">
+              <div class="alias-tag-wrap">
+                <span class="terminal-prompt-icon">$</span>
+                <span class="alias-name">git {item.alias}</span>
+              </div>
+              <button
+                type="button"
+                class="copy-btn copy-btn-sm"
+                data-copy={`git config --global alias.${item.alias} "${item.command.replace(/"/g, '\\"')}"`}
+                aria-label={isEn ? `Copy git config command for alias ${item.alias}` : `Copiar comando de config para alias ${item.alias}`}
+              >
+                <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <svg class="check-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span class="btn-text">{isEn ? 'Copy alias' : 'Copiar atajo'}</span>
+              </button>
+            </div>
+
+            <p class="alias-desc">{item.description}</p>
+            <div class="alias-expansion-box">
+              <small class="expands-label">{isEn ? 'Expands to:' : 'Se expande a:'}</small>
+              <code class="expanded-cmd">git {item.command}</code>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <!-- Right: Complete ~/.gitconfig File Preview -->
+    <div class="config-file-column">
+      <div class="config-card">
+        <div class="config-card-header">
+          <div class="file-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>~/.gitconfig</span>
+          </div>
+
+          <button
+            type="button"
+            class="copy-btn copy-btn-sm"
+            data-copy={sampleGitConfig}
+            aria-label={isEn ? "Copy complete gitconfig block" : "Copiar bloque completo de gitconfig"}
+          >
+            <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <svg class="check-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span class="btn-text">{isEn ? 'Copy full config' : 'Copiar todo'}</span>
+          </button>
+        </div>
+
+        <p class="config-intro">
+          {isEn
+            ? 'Optimized template including automatic branch rebasing, branch defaults, and reuse of recorded conflict resolutions (rerere).'
+            : 'Plantilla optimizada que incluye rebase automático al hacer pull, rama main por defecto y reutilización de resoluciones de conflictos grabadas (rerere).'}
+        </p>
+
+        <pre class="gitconfig-code-preview"><code>{sampleGitConfig}</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .aliases-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-vault {
+    color: var(--accent-gold);
+    background: rgba(250, 204, 21, 0.12);
+    border: 1px solid rgba(250, 204, 21, 0.25);
+  }
+
+  .vault-container {
+    display: grid;
+    grid-template-columns: 1.35fr 0.95fr;
+    gap: 1.75rem;
+    align-items: flex-start;
+  }
+
+  /* Left Column */
+  .aliases-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .aliases-filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .alias-filter-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    font-family: var(--font-display);
+    font-size: 0.775rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+
+  .alias-filter-btn:hover {
+    color: var(--text-main);
+    border-color: var(--border-medium);
+  }
+
+  .alias-filter-btn.active {
+    background: var(--accent-gold);
+    color: #070b14;
+    border-color: var(--accent-gold);
+    font-weight: 700;
+  }
+
+  .count-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    opacity: 0.8;
+  }
+
+  .aliases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: 1rem;
+  }
+
+  .alias-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s;
+  }
+
+  .alias-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(250, 204, 21, 0.4);
+    box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.4);
+  }
+
+  .alias-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .alias-tag-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .terminal-prompt-icon {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--accent-emerald);
+  }
+
+  .alias-name {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--accent-gold);
+  }
+
+  .alias-desc {
+    color: var(--text-muted);
+    font-size: 0.825rem;
+    line-height: 1.45;
+  }
+
+  .alias-expansion-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .expands-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .expanded-cmd {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Right Column: ~/.gitconfig */
+  .config-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 5.5rem;
+  }
+
+  .config-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.75rem;
+  }
+
+  .file-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+  }
+
+  .config-intro {
+    font-size: 0.825rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .gitconfig-code-preview {
+    margin: 0;
+    background: #070b14;
+    border: 1px solid #1e293b;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: #cbd5e1;
+    overflow-x: auto;
+    max-height: 480px;
+  }
+
+  @media (max-width: 960px) {
+    .vault-container {
+      grid-template-columns: 1fr;
+    }
+    .config-card {
+      position: static;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .aliases-grid {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .alias-card {
+      padding: 1rem;
+    }
+
+    .aliases-filter-bar {
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-wrap: nowrap;
+      padding-bottom: 0.4rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .aliases-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .alias-filter-btn {
+      flex: 0 0 auto;
+    }
+  }
+</style>
+
+<script>
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.alias-filter-btn');
+  const aliasCards = document.querySelectorAll<HTMLElement>('.alias-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const cat = btn.getAttribute('data-cat') || 'todos';
+      aliasCards.forEach(card => {
+        const cardCat = card.getAttribute('data-cat');
+        if (cat === 'todos' || cardCat === cat) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>

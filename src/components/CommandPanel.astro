@@ -1,0 +1,461 @@
+---
+// CommandPanel.astro
+import { gitHops as gitHopsEs, gitTopics as gitTopicsEs } from '../data/gitData';
+import { gitHopsEn, gitTopicsEn } from '../data/en/gitData';
+import { highlightCommandTokens } from '../utils/highlighter';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+
+const hops = isEn ? gitHopsEn : gitHopsEs;
+const topics = isEn ? gitTopicsEn : gitTopicsEs;
+
+const allSections = [
+  ...hops.map(h => ({
+    id: h.id,
+    title: h.title,
+    description: h.description,
+    commands: h.commands,
+    type: 'hop' as const,
+    actionTag: h.command
+  })),
+  ...topics.map(t => ({
+    id: t.id,
+    title: t.title,
+    description: t.description,
+    commands: t.commands,
+    type: 'topic' as const,
+    actionTag: t.badge || (isEn ? 'Topic' : 'Tema')
+  }))
+];
+---
+
+<main class="panels-container">
+  {allSections.map((section, idx) => (
+    <section
+      class="panel-card"
+      id={`panel-${section.id}`}
+      data-section-id={section.id}
+      hidden={idx !== 0}
+      tabindex="-1"
+    >
+      <div class="panel-header">
+        <div class="panel-header-main">
+          <div class="panel-meta">
+            <span class="panel-pill">{section.actionTag}</span>
+            <h2 class="panel-title">{section.title}</h2>
+          </div>
+          <p class="panel-description">{section.description}</p>
+        </div>
+
+        <div class="panel-toolbar print-hide">
+          <div class="level-filters" role="group" aria-label={isEn ? "Filter by experience level" : "Filtrar por nivel de experiencia"}>
+            <button type="button" class="lvl-btn active" data-lvl="todos">{isEn ? 'All' : 'Todos'}</button>
+            <button type="button" class="lvl-btn" data-lvl="básico">{isEn ? 'Basic' : 'Básico'}</button>
+            <button type="button" class="lvl-btn" data-lvl="habitual">{isEn ? 'Standard' : 'Habitual'}</button>
+            <button type="button" class="lvl-btn" data-lvl="avanzado">{isEn ? 'Advanced' : 'Avanzado'}</button>
+          </div>
+
+          <button type="button" class="print-sheet-btn" title={isEn ? "Print or save as PDF" : "Imprimir o guardar en PDF"}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>{isEn ? 'Print / PDF' : 'Imprimir / PDF'}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="command-grid">
+        {section.commands.map((item) => (
+          <article
+            class="command-card"
+            data-tag={item.tag || 'habitual'}
+            data-command-search={`${item.command} ${item.description} ${item.detail || ''}`}
+          >
+            <div class="command-main">
+              <div class="command-code-wrapper">
+                <span class="prompt-symbol">$</span>
+                <code class="command-code" set:html={highlightCommandTokens(item.command)} />
+              </div>
+              <p class="command-desc">{item.description}</p>
+              {item.detail && <p class="command-detail">{item.detail}</p>}
+            </div>
+
+            <div class="command-actions">
+              {item.tag && (
+                <span class={`badge badge-${item.tag}`}>
+                  {isEn ? (item.tag === 'básico' ? 'Basic' : item.tag === 'avanzado' ? 'Advanced' : 'Standard') : item.tag}
+                </span>
+              )}
+              <button
+                type="button"
+                class="copy-btn"
+                data-copy={item.command}
+                aria-label={isEn ? `Copy command ${item.command}` : `Copiar comando ${item.command}`}
+              >
+                <svg class="copy-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <svg class="check-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span class="btn-text">{isEn ? 'Copy' : 'Copiar'}</span>
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <!-- Live Search Results Container -->
+  <section class="panel-card" id="panel-search" hidden tabindex="-1">
+    <div class="panel-header">
+      <div class="panel-meta">
+        <span class="panel-pill">{isEn ? 'Global Search' : 'Búsqueda Global'}</span>
+        <h2 class="panel-title">{isEn ? 'Search Results' : 'Resultados encontrados'}</h2>
+      </div>
+      <p class="panel-description">{isEn ? 'Matches found across all command categories.' : 'Coincidencias encontradas en todas las categorías de comandos.'}</p>
+    </div>
+    <div class="command-grid" id="search-results-list"></div>
+  </section>
+</main>
+
+<style>
+  .panels-container {
+    position: relative;
+    margin-bottom: 3.5rem;
+  }
+
+  .panel-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 2rem 1.75rem;
+    box-shadow: var(--shadow-md);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .panel-card[hidden] {
+    display: none;
+  }
+
+  .panel-header {
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .panel-header-main {
+    flex: 1;
+    min-width: 260px;
+  }
+
+  .panel-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .level-filters {
+    display: flex;
+    gap: 0.35rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 9999px;
+    padding: 0.2rem 0.3rem;
+  }
+
+  .lvl-btn {
+    all: unset;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+
+  .lvl-btn:hover {
+    color: var(--text-main);
+  }
+
+  .lvl-btn.active {
+    background: var(--accent-cyan);
+    color: #070b14;
+    font-weight: 700;
+  }
+
+  :global([data-theme="light"]) .lvl-btn.active {
+    color: #ffffff;
+  }
+
+  .print-sheet-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.6rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .print-sheet-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--border-medium);
+  }
+
+  .panel-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .panel-pill {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.2rem 0.65rem;
+    border-radius: 6px;
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+  }
+
+  .panel-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+    color: var(--text-main);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .panel-description {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .command-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Command Card */
+  .command-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.15rem 1.35rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.85rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .command-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-medium);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .command-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .command-code-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .prompt-symbol {
+    font-family: var(--font-mono);
+    color: var(--accent-emerald);
+    font-weight: 700;
+    user-select: none;
+    font-size: 0.95rem;
+  }
+
+  .command-code {
+    font-family: var(--font-mono);
+    font-size: 1.025rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    overflow-wrap: anywhere;
+    letter-spacing: -0.01em;
+  }
+
+  :global(.arg-token) {
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-cyan);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-style: normal;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
+
+  .command-desc {
+    color: var(--text-main);
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .command-detail {
+    color: var(--text-muted);
+    font-size: 0.825rem;
+    line-height: 1.4;
+  }
+
+  .command-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  /* Copy Button */
+  .copy-btn {
+    all: unset;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.9rem;
+    min-width: 6.2rem;
+    justify-content: center;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-medium);
+    border-radius: 0.6rem;
+    color: var(--text-main);
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    user-select: none;
+  }
+
+  .copy-btn:hover {
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.08);
+  }
+
+  .copy-btn:active {
+    transform: scale(0.96);
+  }
+
+  .copy-btn .check-icon {
+    display: none;
+  }
+
+  /* Copied state */
+  .copy-btn.copied {
+    background: var(--accent-emerald);
+    border-color: var(--accent-emerald);
+    color: #070b14;
+    font-weight: 700;
+    animation: popCorrect 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .copy-btn.copied .copy-icon {
+    display: none;
+  }
+
+  .copy-btn.copied .check-icon {
+    display: inline-block;
+  }
+
+  @media (max-width: 768px) {
+    .panel-card {
+      padding: 1.5rem 1.15rem;
+    }
+
+    .command-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .command-actions {
+      width: 100%;
+      justify-content: space-between;
+      border-top: 1px dashed var(--border-subtle);
+      padding-top: 0.75rem;
+    }
+
+    .copy-btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  // Level filter handling
+  const levelButtons = document.querySelectorAll<HTMLButtonElement>('.lvl-btn');
+  const printButtons = document.querySelectorAll<HTMLButtonElement>('.print-sheet-btn');
+
+  levelButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const panel = btn.closest('.panel-card');
+      if (!panel) return;
+
+      const panelBtns = panel.querySelectorAll<HTMLButtonElement>('.lvl-btn');
+      panelBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const lvl = btn.getAttribute('data-lvl') || 'todos';
+      const cards = panel.querySelectorAll<HTMLElement>('.command-card');
+
+      cards.forEach(card => {
+        const cardTag = card.getAttribute('data-tag') || 'habitual';
+        if (lvl === 'todos' || cardTag === lvl) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Print button handling
+  printButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.print();
+    });
+  });
+</script>

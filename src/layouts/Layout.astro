@@ -1,0 +1,227 @@
+---
+// Layout.astro
+interface Props {
+  title?: string;
+  description?: string;
+  lang?: 'es' | 'en';
+}
+
+const {
+  title = "Guía Interactiva de Comandos de Git | Por dónde viajan tus cambios",
+  description = "Aprende visualmente cómo viajan tus cambios en Git a través del árbol de trabajo, staging area, repositorio local y remoto. Referencia rápida e interactiva con comandos para copiar.",
+  lang = "es"
+} = Astro.props;
+
+import '../styles/global.css';
+
+const rawBase = import.meta.env.BASE_URL;
+const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content={description} />
+    <meta name="author" content="Hugo Adama" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href={`${baseUrl}favicon.svg`} />
+    <title>{title}</title>
+
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Open Graph / Meta -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+
+    <!-- Prevent FOUC for theme toggle -->
+    <script is:inline>
+      (function() {
+        try {
+          const saved = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = saved || (prefersDark ? 'dark' : 'dark'); // Default to sleek dark
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Global Top Reading Progress Indicator -->
+    <div id="scroll-progress-bar" class="scroll-progress-bar print-hide" aria-hidden="true"></div>
+
+    <div class="ambient-glow" aria-hidden="true"></div>
+    <div class="ambient-glow-bottom" aria-hidden="true"></div>
+
+    <div class="container">
+      <slot />
+    </div>
+
+    <!-- Floating Global Toast for Copy feedback -->
+    <div id="copy-toast" class="toast" role="status" aria-live="polite" hidden>
+      <div class="toast-icon-wrap" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <span id="toast-text">{lang === 'en' ? 'Command copied to clipboard!' : '¡Comando copiado al portapapeles!'}</span>
+    </div>
+
+    <!-- Floating Back to Top Button -->
+    <button id="scroll-to-top" class="scroll-top-btn print-hide" type="button" aria-label="Volver arriba" title="Volver al inicio" hidden>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
+
+    <script is:inline>
+      // Reading Progress Bar
+      const progressBar = document.getElementById('scroll-progress-bar');
+      if (progressBar) {
+        window.addEventListener('scroll', () => {
+          const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = scrollTotal > 0 ? Math.min(Math.max(window.scrollY / scrollTotal, 0), 1) : 0;
+          progressBar.style.transform = `scaleX(${progress})`;
+        }, { passive: true });
+      }
+
+      // Scroll to Top Button
+      const scrollBtn = document.getElementById('scroll-to-top');
+      if (scrollBtn) {
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 450) {
+            scrollBtn.hidden = false;
+          } else {
+            scrollBtn.hidden = true;
+          }
+        }, { passive: true });
+
+        scrollBtn.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    </script>
+
+    <style>
+      /* Top Reading Progress Bar */
+      .scroll-progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald), var(--accent-gold), var(--accent-purple));
+        transform-origin: 0 50%;
+        transform: scaleX(0);
+        z-index: 999;
+        pointer-events: none;
+        transition: transform 0.05s linear;
+      }
+
+      .scroll-top-btn {
+        all: unset;
+        cursor: pointer;
+        position: fixed;
+        bottom: 2rem;
+        left: 2rem;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 50%;
+        background: var(--bg-card);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1.5px solid var(--border-medium);
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-md);
+        z-index: 99;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .scroll-top-btn:hover {
+        background: var(--accent-cyan);
+        color: #070b14;
+        border-color: var(--accent-cyan);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 0 20px -3px var(--glow-cyan);
+      }
+
+      @media (max-width: 640px) {
+        .scroll-top-btn {
+          bottom: 4.5rem;
+          left: auto;
+          right: 1rem;
+        }
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 2.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(10, 16, 30, 0.94);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        color: #f8fafc;
+        border: 1px solid rgba(16, 185, 129, 0.45);
+        padding: 0.65rem 1.4rem;
+        border-radius: 9999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-family: var(--font-body);
+        font-size: 0.875rem;
+        font-weight: 600;
+        box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.65), 0 0 24px -4px rgba(16, 185, 129, 0.4);
+        z-index: 1000;
+        animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+        white-space: nowrap;
+      }
+
+      .toast-icon-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.4rem;
+        height: 1.4rem;
+        border-radius: 50%;
+        background: rgba(16, 185, 129, 0.18);
+        border: 1px solid rgba(16, 185, 129, 0.35);
+        color: var(--accent-emerald);
+      }
+
+      .toast-icon-wrap svg {
+        color: var(--accent-emerald);
+      }
+
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translate(-50%, 14px) scale(0.92);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, 0) scale(1);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .toast {
+          bottom: 2rem;
+          max-width: calc(100vw - 2rem);
+          white-space: normal;
+          text-align: center;
+          font-size: 0.825rem;
+          padding: 0.6rem 1.15rem;
+        }
+      }
+    </style>
+  </body>
+</html>

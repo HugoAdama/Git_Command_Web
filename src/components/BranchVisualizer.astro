@@ -1,0 +1,530 @@
+---
+// BranchVisualizer.astro
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+---
+
+<section id="seccion-visualizador-ramas" class="visualizer-section" aria-label={isEn ? "Visual branch and commit simulator" : "Simulador visual de ramas y commits"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-tree">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="6" y1="3" x2="6" y2="15"></line>
+        <circle cx="18" cy="6" r="3"></circle>
+        <circle cx="6" cy="18" r="3"></circle>
+        <path d="M18 9a9 9 0 0 1-9 9"></path>
+      </svg>
+      <span>{isEn ? 'Visual Lab' : 'Laboratorio Gráfico'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Visual Branch Simulator: Merge vs Rebase' : 'Simulador Visual de Ramas: Merge vs Rebase'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Observe how commits connect and reorder in real time when running merge or rebase operations in Git.'
+        : 'Observa cómo se conectan y reordenan los commits en tiempo real al ejecutar operaciones de fusión o rebase en Git.'}
+    </p>
+  </div>
+
+  <div class="visualizer-card" data-lang={lang}>
+    <!-- Controls Toolbar -->
+    <div class="viz-controls">
+      <div class="viz-actions-group">
+        <button type="button" id="btn-add-feature" class="viz-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>{isEn ? 'Commit on feature' : 'Commit en feature'}</span>
+        </button>
+
+        <button type="button" id="btn-add-main" class="viz-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>{isEn ? 'Commit on main' : 'Commit en main'}</span>
+        </button>
+
+        <button type="button" id="btn-sim-merge" class="viz-btn viz-btn-accent">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+          </svg>
+          <span>{isEn ? 'Simulate git merge' : 'Simular git merge'}</span>
+        </button>
+
+        <button type="button" id="btn-sim-rebase" class="viz-btn viz-btn-purple">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+          <span>{isEn ? 'Simulate git rebase' : 'Simular git rebase'}</span>
+        </button>
+      </div>
+
+      <button type="button" id="btn-reset-tree" class="viz-reset-btn" title={isEn ? "Reset tree to initial state" : "Reiniciar árbol a estado inicial"}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+        <span>{isEn ? 'Reset' : 'Reiniciar'}</span>
+      </button>
+    </div>
+
+    <!-- SVG Canvas Display -->
+    <div class="svg-canvas-container" role="img" aria-label={isEn ? "Interactive commit graph" : "Gráfico interactivo de commits"}>
+      <svg id="tree-svg" class="tree-svg" viewBox="0 0 900 240" preserveAspectRatio="xMidYMid meet">
+        <!-- Grid and track lines rendered via script -->
+      </svg>
+    </div>
+
+    <!-- Visual Legend and Explanation -->
+    <div class="viz-footer-info">
+      <div class="viz-legend">
+        <div class="legend-item">
+          <span class="legend-circle main-circle"></span>
+          <span>{isEn ? 'main branch' : 'Rama main'}</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-circle feature-circle"></span>
+          <span>{isEn ? 'feature branch (feat/login)' : 'Rama feature (feat/login)'}</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-circle merge-circle"></span>
+          <span>{isEn ? 'Merge commit' : 'Commit de fusión (Merge)'}</span>
+        </div>
+      </div>
+
+      <div class="viz-status-box" id="viz-status-text">
+        {isEn
+          ? <><strong>Initial state:</strong> The feature branch diverged from C2. Simulate <em>git merge</em> to view the 3-way merge commit or <em>git rebase</em> to see the commits replayed linearly onto main.</>
+          : <><strong>Estado inicial:</strong> La rama feature se bifurcó desde C2. Puedes simular <em>git merge</em> para ver el commit de unión o <em>git rebase</em> para ver cómo se aplana la historia en línea recta.</>}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .visualizer-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-tree {
+    color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
+
+  .visualizer-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 1.75rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  .viz-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: 1.5rem;
+  }
+
+  .viz-actions-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .viz-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 0.6rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+    color: var(--text-main);
+    font-family: var(--font-display);
+    font-size: 0.825rem;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .viz-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    transform: translateY(-1px);
+  }
+
+  .viz-btn-accent {
+    border-color: rgba(250, 204, 21, 0.4);
+    color: var(--accent-gold);
+  }
+  .viz-btn-accent:hover {
+    background: rgba(250, 204, 21, 0.15);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+  }
+
+  .viz-btn-purple {
+    border-color: rgba(168, 85, 247, 0.4);
+    color: var(--accent-purple);
+  }
+  .viz-btn-purple:hover {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: var(--accent-purple);
+    color: var(--accent-purple);
+  }
+
+  .viz-reset-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    transition: all 0.2s;
+  }
+
+  .viz-reset-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* SVG Canvas */
+  .svg-canvas-container {
+    background: #080c14;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.85rem;
+    padding: 1.5rem 1rem;
+    overflow-x: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .tree-svg {
+    width: 100%;
+    max-width: 900px;
+    height: 240px;
+  }
+
+  :global(.commit-node) {
+    animation: commitScaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transform-origin: center;
+  }
+
+  :global(.commit-node.merge-commit circle) {
+    animation: mergeGlow 1.8s infinite ease-in-out;
+  }
+
+  @keyframes commitScaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes mergeGlow {
+    0%, 100% {
+      filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.4));
+    }
+    50% {
+      filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.9));
+    }
+  }
+
+  /* Footer info & legend */
+  .viz-footer-info {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .viz-legend {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.825rem;
+    color: var(--text-muted);
+  }
+
+  .legend-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .main-circle {
+    background: var(--accent-cyan);
+    box-shadow: 0 0 8px var(--accent-cyan);
+  }
+
+  .feature-circle {
+    background: var(--accent-purple);
+    box-shadow: 0 0 8px var(--accent-purple);
+  }
+
+  .merge-circle {
+    background: var(--accent-gold);
+    box-shadow: 0 0 8px var(--accent-gold);
+  }
+
+  .viz-status-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    padding: 0.85rem 1.15rem;
+    font-size: 0.875rem;
+    color: var(--text-main);
+    line-height: 1.5;
+  }
+
+  .viz-status-box strong {
+    color: var(--accent-cyan);
+  }
+</style>
+
+<script>
+  // Interactive Tree Visualizer Logic
+  const svg = document.getElementById('tree-svg');
+  const statusText = document.getElementById('viz-status-text');
+  const btnAddFeature = document.getElementById('btn-add-feature');
+  const btnAddMain = document.getElementById('btn-add-main');
+  const btnSimMerge = document.getElementById('btn-sim-merge');
+  const btnSimRebase = document.getElementById('btn-sim-rebase');
+  const btnResetTree = document.getElementById('btn-reset-tree');
+
+  type TreeMode = 'normal' | 'merged' | 'rebased';
+
+  interface TreeState {
+    mainCommits: string[];
+    featureCommits: string[];
+    mode: TreeMode;
+  }
+
+  let state: TreeState = {
+    mainCommits: ['C1', 'C2', 'C3'],
+    featureCommits: ['C4', 'C5'],
+    mode: 'normal'
+  };
+
+  function renderTree() {
+    if (!svg) return;
+
+    const mainY = 70;
+    const featY = 160;
+    let svgContent = '';
+
+    if (state.mode === 'rebased') {
+      // Rebase mode: Linear single line!
+      const totalCommits = [...state.mainCommits, ...state.featureCommits.map(c => `${c}'`)];
+      const spacing = Math.min(100, Math.floor(750 / (totalCommits.length + 1)));
+      const startX = 80;
+
+      // Draw single line
+      const endX = startX + (totalCommits.length - 1) * spacing;
+      svgContent += `
+        <line x1="${startX}" y1="${mainY}" x2="${endX}" y2="${mainY}" stroke="#334155" stroke-width="3" />
+      `;
+
+      totalCommits.forEach((commit, idx) => {
+        const x = startX + idx * spacing;
+        const isRebased = commit.includes("'");
+        const color = isRebased ? '#a855f7' : '#38bdf8';
+        svgContent += `
+          <g>
+            <circle cx="${x}" cy="${mainY}" r="15" fill="#090d16" stroke="${color}" stroke-width="3" />
+            <text x="${x}" y="${mainY + 4}" fill="#f8fafc" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" text-anchor="middle">${commit}</text>
+          </g>
+        `;
+      });
+
+      // Branch Labels
+      svgContent += `
+        <rect x="${endX + 25}" y="${mainY - 14}" width="140" height="26" rx="6" fill="rgba(56, 189, 248, 0.2)" stroke="#38bdf8" />
+        <text x="${endX + 95}" y="${mainY + 3}" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">HEAD -> main, feat*</text>
+      `;
+
+    } else {
+      // Normal or Merged mode
+      const spacing = 110;
+      const startX = 90;
+
+      // Main line track
+      const mainEndX = startX + (state.mainCommits.length + (state.mode === 'merged' ? 1 : 0)) * spacing;
+      svgContent += `
+        <line x1="${startX}" y1="${mainY}" x2="${mainEndX}" y2="${mainY}" stroke="#334155" stroke-width="3" />
+      `;
+
+      // Branching curve from C2 to C4
+      const c2X = startX + spacing;
+      const c4X = c2X + spacing;
+      svgContent += `
+        <path d="M ${c2X} ${mainY} C ${c2X + 50} ${mainY}, ${c4X - 50} ${featY}, ${c4X} ${featY}" fill="none" stroke="#64748b" stroke-width="3" stroke-dasharray="4 4" />
+      `;
+
+      // Feature line track
+      const featEndX = c4X + (state.featureCommits.length - 1) * spacing;
+      svgContent += `
+        <line x1="${c4X}" y1="${featY}" x2="${featEndX}" y2="${featY}" stroke="#334155" stroke-width="3" />
+      `;
+
+      // Draw Main Commits
+      state.mainCommits.forEach((commit, idx) => {
+        const x = startX + idx * spacing;
+        svgContent += `
+          <g class="commit-node">
+            <circle cx="${x}" cy="${mainY}" r="15" fill="#090d16" stroke="#38bdf8" stroke-width="3" />
+            <text x="${x}" y="${mainY + 4}" fill="#f8fafc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">${commit}</text>
+          </g>
+        `;
+      });
+
+      // Draw Feature Commits
+      state.featureCommits.forEach((commit, idx) => {
+        const x = c4X + idx * spacing;
+        svgContent += `
+          <g class="commit-node">
+            <circle cx="${x}" cy="${featY}" r="15" fill="#090d16" stroke="#a855f7" stroke-width="3" />
+            <text x="${x}" y="${featY + 4}" fill="#f8fafc" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">${commit}</text>
+          </g>
+        `;
+      });
+
+      // Draw Merge Commit and arcs if merged
+      if (state.mode === 'merged') {
+        const mergeX = Math.max(mainEndX, featEndX + spacing);
+        // line from last main to merge
+        svgContent += `
+          <line x1="${mainEndX - spacing}" y1="${mainY}" x2="${mergeX}" y2="${mainY}" stroke="#facc15" stroke-width="3" />
+        `;
+        // curve from last feature to merge
+        svgContent += `
+          <path d="M ${featEndX} ${featY} C ${featEndX + 50} ${featY}, ${mergeX - 40} ${mainY}, ${mergeX} ${mainY}" fill="none" stroke="#facc15" stroke-width="3" />
+          <g class="commit-node merge-commit">
+            <circle cx="${mergeX}" cy="${mainY}" r="16" fill="#090d16" stroke="#facc15" stroke-width="3" />
+            <text x="${mergeX}" y="${mainY + 4}" fill="#facc15" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" text-anchor="middle">C_M</text>
+          </g>
+          <rect x="${mergeX + 25}" y="${mainY - 14}" width="95" height="26" rx="6" fill="rgba(250, 204, 21, 0.2)" stroke="#facc15" />
+          <text x="${mergeX + 72}" y="${mainY + 3}" fill="#facc15" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">HEAD -> main</text>
+        `;
+      } else {
+        // Main Label
+        const lastMainX = startX + (state.mainCommits.length - 1) * spacing;
+        svgContent += `
+          <rect x="${lastMainX + 25}" y="${mainY - 14}" width="65" height="26" rx="6" fill="rgba(56, 189, 248, 0.2)" stroke="#38bdf8" />
+          <text x="${lastMainX + 57}" y="${mainY + 3}" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">main</text>
+        `;
+        // Feature Label
+        svgContent += `
+          <rect x="${featEndX + 25}" y="${featY - 14}" width="85" height="26" rx="6" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" />
+          <text x="${featEndX + 67}" y="${featY + 3}" fill="#a855f7" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">feat/login</text>
+        `;
+      }
+    }
+
+    svg.innerHTML = svgContent;
+  }
+
+  function setStatus(msg: string) {
+    if (statusText) statusText.innerHTML = msg;
+  }
+
+    const card = document.querySelector<HTMLElement>('.visualizer-card');
+    const isEn = card?.getAttribute('data-lang') === 'en';
+
+    if (btnAddFeature) {
+      btnAddFeature.addEventListener('click', () => {
+        if (state.mode !== 'normal') return;
+        const nextId = `C${state.mainCommits.length + state.featureCommits.length + 1}`;
+        state.featureCommits.push(nextId);
+        renderTree();
+        setStatus(isEn
+          ? `<strong>New commit on feature:</strong> Added commit <code>${nextId}</code> to branch feat/login.`
+          : `<strong>Nuevo commit añadido a feature:</strong> Se agregó el commit <code>${nextId}</code> en la rama feat/login.`);
+      });
+    }
+
+    if (btnAddMain) {
+      btnAddMain.addEventListener('click', () => {
+        if (state.mode !== 'normal') return;
+        const nextId = `C${state.mainCommits.length + state.featureCommits.length + 1}`;
+        state.mainCommits.push(nextId);
+        renderTree();
+        setStatus(isEn
+          ? `<strong>New commit on main:</strong> Added commit <code>${nextId}</code> to the main branch.`
+          : `<strong>Nuevo commit añadido a main:</strong> Se agregó el commit <code>${nextId}</code> en la rama principal.`);
+      });
+    }
+
+    if (btnSimMerge) {
+      btnSimMerge.addEventListener('click', () => {
+        state.mode = 'merged';
+        renderTree();
+        setStatus(isEn
+          ? `<strong>Git merge simulation completed:</strong> Created special 3-way merge commit <code>C_M</code> with two parents (HEAD of main and HEAD of feature). Divergent history is preserved.`
+          : `<strong>Simulación de git merge completada:</strong> Se creó el commit especial de fusión <code>C_M</code> que tiene dos padres (el último de main y el último de feature). La historia bifurcada original se conserva intacta.`);
+      });
+    }
+
+    if (btnSimRebase) {
+      btnSimRebase.addEventListener('click', () => {
+        state.mode = 'rebased';
+        renderTree();
+        setStatus(isEn
+          ? `<strong>Git rebase simulation completed:</strong> Git took feature commits (C4 and C5), recomputed patch diffs and replayed them on top of the latest main commit as C4' and C5'. The history is now completely linear without merge commits!`
+          : `<strong>Simulación de git rebase completada:</strong> Git tomó los commits de feature (C4 y C5), recalculó sus diferencias y los trasplantó encima del commit más reciente de main como C4' y C5'. ¡El historial quedó 100% lineal sin commits de mezcla!`);
+      });
+    }
+
+    if (btnResetTree) {
+      btnResetTree.addEventListener('click', () => {
+        state = {
+          mainCommits: ['C1', 'C2', 'C3'],
+          featureCommits: ['C4', 'C5'],
+          mode: 'normal'
+        };
+        renderTree();
+        setStatus(isEn
+          ? `<strong>Tree reset:</strong> Initial state with C1-C3 on main and C4-C5 branched onto feature.`
+          : `<strong>Árbol reiniciado:</strong> Estado inicial con C1-C3 en main y C4-C5 bifurcados en feature.`);
+      });
+    }
+
+  // Initial draw
+  renderTree();
+</script>

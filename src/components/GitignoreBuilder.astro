@@ -1,0 +1,311 @@
+---
+// GitignoreBuilder.astro
+import { gitignorePresets } from '../data/gitignorePresets';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+---
+
+<section id="seccion-gitignore" class="gitignore-section" aria-label={isEn ? "Interactive gitignore generator" : "Generador interactivo de archivos gitignore"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-ignore">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="9" y1="15" x2="15" y2="15"></line>
+      </svg>
+      <span>{isEn ? 'Error Prevention' : 'Prevención de Errores'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Interactive .gitignore Generator' : 'Generador Interactivo de .gitignore'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Prevent accidental leakage of secrets, API keys, or bulky folders like node_modules/. Select your stack and download a ready-to-use file.'
+        : 'Evita subir por accidente secretos, contraseñas o carpetas gigantescas como node_modules/. Marca tus tecnologías y obtén tu archivo listo.'}
+    </p>
+  </div>
+
+  <div class="gitignore-card">
+    <!-- Presets Selection Chips -->
+    <div class="presets-selector">
+      <span class="selector-title">{isEn ? 'Select your stack and tools:' : 'Selecciona tus tecnologías y entorno:'}</span>
+      <div class="presets-chips">
+        {gitignorePresets.map((preset) => (
+          <label class="preset-chip">
+            <input
+              type="checkbox"
+              class="preset-checkbox"
+              data-preset-id={preset.id}
+              checked={preset.defaultChecked}
+            />
+            <span class="chip-label">
+              <span class="chip-custom-check" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+              <span class="chip-name">{preset.name}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+    </div>
+
+    <!-- Output Code Preview -->
+    <div class="output-preview-box">
+      <div class="preview-header">
+        <div class="file-name-tag">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span>.gitignore</span>
+        </div>
+
+        <div class="preview-actions">
+          <button type="button" id="copy-gitignore-btn" class="copy-btn copy-btn-sm" data-copy="">
+            <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <svg class="check-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="btn-text">{isEn ? 'Copy contents' : 'Copiar contenido'}</span>
+          </button>
+
+          <button type="button" id="download-gitignore-btn" class="download-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>{isEn ? 'Download file' : 'Descargar archivo'}</span>
+          </button>
+        </div>
+      </div>
+
+      <pre id="gitignore-code-output" class="gitignore-pre"></pre>
+    </div>
+  </div>
+</section>
+
+<style>
+  .gitignore-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-ignore {
+    color: var(--accent-gold);
+    background: rgba(250, 204, 21, 0.12);
+    border: 1px solid rgba(250, 204, 21, 0.25);
+  }
+
+  .gitignore-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 2rem 1.75rem;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .selector-title {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.85rem;
+  }
+
+  .presets-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .preset-chip {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .preset-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .chip-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 9999px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+    color: var(--text-muted);
+    font-size: 0.825rem;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .chip-custom-check {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    transition: all 0.2s;
+  }
+
+  .preset-checkbox:checked + .chip-label {
+    background: rgba(250, 204, 21, 0.12);
+    border-color: var(--accent-gold);
+    color: var(--text-main);
+  }
+
+  .preset-checkbox:checked + .chip-label .chip-custom-check {
+    background: var(--accent-gold);
+    border-color: var(--accent-gold);
+    color: #070b14;
+  }
+
+  /* Preview Box */
+  .output-preview-box {
+    background: #080c14;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.85rem;
+    overflow: hidden;
+  }
+
+  .preview-header {
+    background: #0f172a;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .file-name-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent-cyan);
+    font-weight: 600;
+  }
+
+  .preview-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .download-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 0.6rem;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    color: var(--accent-cyan);
+    font-family: var(--font-display);
+    font-size: 0.825rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .download-btn:hover {
+    background: rgba(56, 189, 248, 0.2);
+    border-color: var(--accent-cyan);
+  }
+
+  .gitignore-pre {
+    margin: 0;
+    padding: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #94a3b8;
+    max-height: 320px;
+    overflow-y: auto;
+    white-space: pre;
+  }
+</style>
+
+<script>
+  import { gitignorePresets } from '../data/gitignorePresets';
+
+  const checkboxes = document.querySelectorAll<HTMLInputElement>('.preset-checkbox');
+  const codeOutput = document.getElementById('gitignore-code-output');
+  const copyBtn = document.getElementById('copy-gitignore-btn');
+  const downloadBtn = document.getElementById('download-gitignore-btn');
+
+  function updateGitignore() {
+    if (!codeOutput || !copyBtn) return;
+
+    const selectedIds = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.getAttribute('data-preset-id'));
+
+    const lines: string[] = [
+      '# Archivo .gitignore generado automaticamente',
+      '# Git Command Web — Referencia Didactica de Git',
+      ''
+    ];
+
+    gitignorePresets.forEach(preset => {
+      if (selectedIds.includes(preset.id)) {
+        lines.push(`### ${preset.name} ###`);
+        lines.push(...preset.patterns);
+        lines.push('');
+      }
+    });
+
+    const fullText = lines.join('\n');
+    codeOutput.textContent = fullText;
+    copyBtn.setAttribute('data-copy', fullText);
+  }
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', updateGitignore);
+  });
+
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+      const text = codeOutput?.textContent || '';
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '.gitignore';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  // Initial generation
+  updateGitignore();
+</script>

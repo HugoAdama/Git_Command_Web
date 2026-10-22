@@ -1,0 +1,313 @@
+---
+// GitGlossary.astro
+import { gitGlossaryTerms as gitGlossaryTermsEs } from '../data/gitGlossaryData';
+import { gitGlossaryTermsEn } from '../data/en/gitGlossaryData';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const terms = isEn ? gitGlossaryTermsEn : gitGlossaryTermsEs;
+---
+
+<section id="seccion-glosario" class="glossary-section" aria-label={isEn ? "Visual glossary of key Git concepts" : "Glosario visual de conceptos clave de Git"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-glossary">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      <span>{isEn ? 'Mental Dictionary' : 'Diccionario Mental'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Visual Glossary of Key Concepts' : 'Glosario Visual de Conceptos Clave'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Git has its own jargon. Here are technical definitions translated into everyday real-world metaphors so you never forget what each concept represents.'
+        : 'Git tiene su propia jerga. Aquí tienes las definiciones técnicas traducidas a metáforas cotidianas para que nunca más olvides qué es cada concepto.'}
+    </p>
+  </div>
+
+  <!-- Category Filter Bar -->
+  <div class="glossary-filters" role="tablist" aria-label={isEn ? "Filter glossary terms" : "Filtrar términos del glosario"}>
+    <button type="button" class="glossary-filter-btn active" data-cat="todos">
+      <span>{isEn ? 'All' : 'Todos'}</span>
+      <span class="count-badge">{terms.length}</span>
+    </button>
+    <button type="button" class="glossary-filter-btn" data-cat="punteros">
+      <span>{isEn ? 'Pointers (HEAD, Reflog)' : 'Punteros (HEAD, Reflog)'}</span>
+    </button>
+    <button type="button" class="glossary-filter-btn" data-cat="estructuras">
+      <span>{isEn ? 'Structures (Index, Tree, Hash)' : 'Estructuras (Index, Tree, Hash)'}</span>
+    </button>
+    <button type="button" class="glossary-filter-btn" data-cat="remotos">
+      <span>{isEn ? 'Remotes (Origin, Upstream)' : 'Remotos (Origin, Upstream)'}</span>
+    </button>
+    <button type="button" class="glossary-filter-btn" data-cat="operaciones">
+      <span>{isEn ? 'Operations (Fast-Forward, Cherry-Pick, Squash)' : 'Operaciones (Fast-Forward, Cherry-Pick, Squash)'}</span>
+    </button>
+  </div>
+
+  <!-- Glossary Cards Grid -->
+  <div class="glossary-grid">
+    {terms.map((item) => (
+      <article class="glossary-card" data-cat={item.category}>
+        <div class="glossary-card-top">
+          <span class="glossary-cat-tag">{item.category}</span>
+          <h3 class="glossary-term">{item.term}</h3>
+        </div>
+
+        <div class="metaphor-box">
+          <div class="metaphor-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>{isEn ? 'Everyday metaphor:' : 'Metáfora cotidiana:'}</span>
+          </div>
+          <p class="metaphor-text">{item.metaphor}</p>
+        </div>
+
+        <div class="definition-box">
+          <strong class="def-label">{isEn ? 'Technical definition:' : 'Definición técnica:'}</strong>
+          <p class="def-text">{item.definition}</p>
+        </div>
+
+        {item.sampleCommand && (
+          <div class="glossary-cmd-row">
+            <code class="glossary-code">{item.sampleCommand}</code>
+            <button
+              type="button"
+              class="copy-btn copy-btn-sm"
+              data-copy={item.sampleCommand}
+              aria-label={isEn ? `Copy ${item.sampleCommand}` : `Copiar ${item.sampleCommand}`}
+            >
+              <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <svg class="check-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span class="btn-text">{isEn ? 'Copy' : 'Copiar'}</span>
+            </button>
+          </div>
+        )}
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .glossary-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-glossary {
+    color: var(--accent-purple);
+    background: rgba(168, 85, 247, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+  }
+
+  .glossary-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-bottom: 2rem;
+  }
+
+  .glossary-filter-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 1rem;
+    border-radius: 9999px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .glossary-filter-btn:hover {
+    color: var(--text-main);
+    border-color: var(--border-medium);
+  }
+
+  .glossary-filter-btn.active {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: var(--accent-purple);
+    color: var(--accent-purple);
+  }
+
+  .count-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.1rem 0.4rem;
+    border-radius: 9999px;
+  }
+
+  .glossary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 1.5rem;
+  }
+
+  .glossary-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.15rem;
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glossary-card:hover {
+    border-color: var(--border-medium);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .glossary-card[hidden] {
+    display: none;
+  }
+
+  .glossary-cat-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent-purple);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .glossary-term {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.25;
+  }
+
+  .metaphor-box {
+    background: rgba(56, 189, 248, 0.06);
+    border-left: 3px solid var(--accent-cyan);
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .metaphor-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+
+  .metaphor-text {
+    font-size: 0.85rem;
+    color: var(--text-main);
+    line-height: 1.45;
+  }
+
+  .definition-box {
+    font-size: 0.825rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .def-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+
+  .glossary-cmd-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.6rem;
+    padding: 0.45rem 0.75rem;
+  }
+
+  .glossary-code {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent-gold);
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 640px) {
+    .glossary-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .glossary-card {
+      padding: 1.25rem 1rem;
+    }
+
+    .glossary-filter-bar {
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-wrap: nowrap;
+      padding-bottom: 0.4rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .glossary-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .glossary-filter-btn {
+      flex: 0 0 auto;
+    }
+  }
+</style>
+
+<script>
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.glossary-filter-btn');
+  const cards = document.querySelectorAll<HTMLElement>('.glossary-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const cat = btn.getAttribute('data-cat');
+      cards.forEach(card => {
+        const cardCat = card.getAttribute('data-cat');
+        if (cat === 'todos' || cardCat === cat) {
+          card.hidden = false;
+        } else {
+          card.hidden = true;
+        }
+      });
+    });
+  });
+</script>

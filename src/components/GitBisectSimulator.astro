@@ -1,0 +1,575 @@
+---
+// GitBisectSimulator.astro
+import { bisectCommitsEs } from '../data/gitToolsData';
+import { bisectCommitsEn } from '../data/en/gitToolsData';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const commits = isEn ? bisectCommitsEn : bisectCommitsEs;
+---
+
+<section id="seccion-bisect" class="bisect-section" aria-label={isEn ? "Git bisect binary search simulator" : "Simulador de detección de errores con git bisect"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-bisect">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <line x1="11" y1="8" x2="11" y2="14"></line>
+        <line x1="8" y1="11" x2="14" y2="11"></line>
+      </svg>
+      <span>{isEn ? 'Binary Search Bug Hunter' : 'Cazador Binario de Bugs'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Git Bisect: Pinpoint the Buggy Commit' : 'Simulador Interactivo de Git Bisect'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Find which exact commit introduced a bug in production using binary search O(log N). Step through bisecting good/bad revisions or automate with tests.'
+        : 'Descubre qué commit exacto rompió producción mediante búsqueda binaria O(log N). Prueba estados de código o automatiza la búsqueda con tus tests.'}
+    </p>
+  </div>
+
+  <div class="bisect-card" data-commits-json={JSON.stringify(commits)} data-lang={lang}>
+    <!-- Step Controls & Instructions -->
+    <div class="bisect-header-controls">
+      <div class="bisect-status-text">
+        <strong id="bisect-headline">
+          {isEn ? 'Status: Ready to start bisecting' : 'Estado: Listo para iniciar la depuración'}
+        </strong>
+        <p id="bisect-subline">
+          {isEn
+            ? 'Commit C8 is broken (bad) and C1 is verified working (good). Click Start to let Git bisect the midpoint.'
+            : 'El commit C8 está roto (bad) y C1 funcionaba correctamente (good). Haz clic en Iniciar para calcular el punto medio.'}
+        </p>
+      </div>
+
+      <div class="bisect-btn-group">
+        <button type="button" class="bisect-action-btn btn-start" id="btn-bisect-start">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>{isEn ? 'Start Bisect' : 'Iniciar Bisect'}</span>
+        </button>
+
+        <button type="button" class="bisect-action-btn btn-good" id="btn-bisect-good" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>git bisect good</span>
+        </button>
+
+        <button type="button" class="bisect-action-btn btn-bad" id="btn-bisect-bad" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          <span>git bisect bad</span>
+        </button>
+
+        <button type="button" class="bisect-action-btn btn-reset" id="btn-bisect-reset">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          <span>{isEn ? 'Reset' : 'Reiniciar'}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive Commit Timeline Graph -->
+    <div class="timeline-container">
+      <div class="timeline-track-line"></div>
+      <div class="commits-strip">
+        {commits.map((c, idx) => (
+          <div
+            class={`commit-step-node node-index-${idx}`}
+            id={`bisect-node-${idx}`}
+            data-index={idx}
+          >
+            <div class="node-circle">
+              <span class="commit-id-num">C{c.id}</span>
+              <span class="node-state-badge" id={`badge-state-${idx}`}></span>
+            </div>
+            <div class="node-details">
+              <code class="commit-hash">{c.hash}</code>
+              <span class="commit-msg">{c.message}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Culprit Alert Card (Hidden until pinpointed) -->
+    <div class="culprit-banner" id="culprit-banner" hidden>
+      <div class="culprit-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <div class="culprit-text">
+        <strong id="culprit-title">
+          {isEn ? 'Culprit Commit Pinpointed!' : '¡Commit Culpable Identificado!'}
+        </strong>
+        <p id="culprit-details"></p>
+      </div>
+    </div>
+
+    <!-- Automation Tip -->
+    <div class="bisect-tip-bar">
+      <span class="tip-tag">{isEn ? 'Pro Automation:' : 'Automatización Pro:'}</span>
+      <p>
+        {isEn
+          ? 'You can automate bisecting completely using a test script:'
+          : 'Puedes automatizar la búsqueda al 100% conectándola con tu suite de pruebas:'}
+        <code>git bisect run npm test</code>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bisect-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-bisect {
+    color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
+
+  .bisect-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 1.75rem;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .bisect-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 1.25rem;
+  }
+
+  .bisect-status-text {
+    flex: 1;
+    min-width: 260px;
+  }
+
+  .bisect-status-text strong {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    color: var(--text-main);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .bisect-status-text p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .bisect-btn-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .bisect-action-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+
+  .bisect-action-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .bisect-action-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .btn-start:hover:not(:disabled) {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+  }
+
+  .btn-good:hover:not(:disabled) {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--accent-emerald);
+    color: var(--accent-emerald);
+  }
+
+  .btn-bad:hover:not(:disabled) {
+    background: rgba(244, 63, 94, 0.15);
+    border-color: var(--accent-rose);
+    color: var(--accent-rose);
+  }
+
+  /* Timeline Strip */
+  .timeline-container {
+    position: relative;
+    padding: 2.5rem 0 1rem;
+    overflow-x: auto;
+  }
+
+  .timeline-track-line {
+    position: absolute;
+    top: 48px;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: #334155;
+    z-index: 0;
+  }
+
+  .commits-strip {
+    display: flex;
+    justify-content: space-between;
+    min-width: 720px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .commit-step-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+    text-align: center;
+    width: 85px;
+    transition: all 0.3s ease;
+  }
+
+  .node-circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #090d16;
+    border: 2px solid #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    position: relative;
+    transition: all 0.25s ease;
+  }
+
+  .commit-step-node.active .node-circle {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 14px var(--accent-cyan);
+    transform: scale(1.15);
+    color: var(--accent-cyan);
+  }
+
+  .commit-step-node.state-good .node-circle {
+    border-color: var(--accent-emerald);
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-emerald);
+  }
+
+  .commit-step-node.state-bad .node-circle {
+    border-color: var(--accent-rose);
+    background: rgba(244, 63, 94, 0.15);
+    color: var(--accent-rose);
+  }
+
+  .commit-step-node.culprit .node-circle {
+    border-color: #ef4444;
+    background: #ef4444;
+    color: #ffffff;
+    animation: beaconPulse 1.5s infinite;
+  }
+
+  .node-state-badge {
+    position: absolute;
+    top: -22px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .commit-step-node.state-good .node-state-badge { color: var(--accent-emerald); }
+  .commit-step-node.state-bad .node-state-badge { color: var(--accent-rose); }
+  .commit-step-node.culprit .node-state-badge { color: #f87171; font-weight: 800; }
+
+  .node-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .commit-hash {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+
+  .commit-msg {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Culprit Banner */
+  .culprit-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1.5px solid rgba(239, 68, 68, 0.4);
+    border-radius: 0.85rem;
+    padding: 1rem 1.25rem;
+    animation: popCorrect 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .culprit-banner[hidden] { display: none; }
+
+  .culprit-icon {
+    color: #ef4444;
+    flex-shrink: 0;
+  }
+
+  .culprit-text strong {
+    color: #fca5a5;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .culprit-text p {
+    color: #f1f5f9;
+    font-size: 0.85rem;
+  }
+
+  .bisect-tip-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+  }
+
+  .tip-tag {
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+  }
+
+  .bisect-tip-bar code {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--accent-gold);
+    margin-left: 0.35rem;
+  }
+
+  @media (max-width: 640px) {
+    .bisect-card {
+      padding: 1.25rem 1rem;
+      gap: 1.25rem;
+    }
+
+    .bisect-status-text {
+      min-width: 100%;
+    }
+
+    .bisect-btn-group {
+      width: 100%;
+    }
+
+    .bisect-action-btn {
+      flex: 1;
+      justify-content: center;
+      padding: 0.45rem 0.5rem;
+      font-size: 0.75rem;
+    }
+  }
+</style>
+
+<script>
+  import type { BisectCommit } from '../data/gitToolsData';
+
+  const card = document.querySelector<HTMLElement>('.bisect-card');
+  const commits: BisectCommit[] = card?.dataset.commitsJson ? JSON.parse(card.dataset.commitsJson) : [];
+  const isEn = card?.dataset.lang === 'en';
+
+  let low = 0; // C1 is good
+  let high = commits.length - 1; // C8 is bad
+  let currentMid = -1;
+  let isStarted = false;
+
+  const btnStart = document.getElementById('btn-bisect-start') as HTMLButtonElement | null;
+  const btnGood = document.getElementById('btn-bisect-good') as HTMLButtonElement | null;
+  const btnBad = document.getElementById('btn-bisect-bad') as HTMLButtonElement | null;
+  const btnReset = document.getElementById('btn-bisect-reset') as HTMLButtonElement | null;
+
+  const headline = document.getElementById('bisect-headline');
+  const subline = document.getElementById('bisect-subline');
+  const culpritBanner = document.getElementById('culprit-banner');
+  const culpritDetails = document.getElementById('culprit-details');
+
+  function calculateMid(l: number, h: number) {
+    return Math.floor((l + h) / 2);
+  }
+
+  function updateView() {
+    commits.forEach((_, idx) => {
+      const node = document.getElementById(`bisect-node-${idx}`);
+      const badge = document.getElementById(`badge-state-${idx}`);
+      if (!node || !badge) return;
+
+      node.classList.remove('active', 'culprit', 'state-good', 'state-bad');
+      badge.textContent = '';
+
+      if (idx === 0) {
+        node.classList.add('state-good');
+        badge.textContent = 'GOOD';
+      }
+      if (idx === commits.length - 1) {
+        node.classList.add('state-bad');
+        badge.textContent = 'BAD';
+      }
+
+      if (isStarted && idx === currentMid) {
+        node.classList.add('active');
+        badge.textContent = 'TESTING';
+      }
+    });
+
+    if (!isStarted) {
+      if (btnStart) btnStart.disabled = false;
+      if (btnGood) btnGood.disabled = true;
+      if (btnBad) btnBad.disabled = true;
+      if (culpritBanner) culpritBanner.hidden = true;
+      if (headline) headline.textContent = isEn ? 'Status: Ready to start bisecting' : 'Estado: Listo para iniciar la depuración';
+      if (subline) subline.textContent = isEn
+        ? 'Commit C8 is broken (bad) and C1 is verified working (good). Click Start to let Git calculate the midpoint.'
+        : 'El commit C8 está roto (bad) y C1 funcionaba correctamente (good). Haz clic en Iniciar para calcular el punto medio.';
+      return;
+    }
+
+    if (btnStart) btnStart.disabled = true;
+
+    // Check if narrowed down to culprit
+    if (low + 1 === high) {
+      const culprit = commits[high];
+      if (btnGood) btnGood.disabled = true;
+      if (btnBad) btnBad.disabled = true;
+
+      const culpritNode = document.getElementById(`bisect-node-${high}`);
+      const culpritBadge = document.getElementById(`badge-state-${high}`);
+      if (culpritNode) culpritNode.classList.add('culprit');
+      if (culpritBadge) culpritBadge.textContent = 'BUG INTRODUCED';
+
+      if (culpritBanner && culpritDetails) {
+        culpritBanner.hidden = false;
+        culpritDetails.textContent = isEn
+          ? `${culprit.hash} (${culprit.message}) by ${culprit.author} is the first bad commit.`
+          : `${culprit.hash} (${culprit.message}) de ${culprit.author} fue el primer commit con el fallo.`;
+      }
+
+      if (headline) headline.textContent = isEn ? 'Bisect Complete!' : '¡Búsqueda Finalizada!';
+      if (subline) subline.textContent = isEn
+        ? `Found first broken commit in ${Math.ceil(Math.log2(commits.length))} steps.`
+        : `Encontrado el commit defectuoso en solo ${Math.ceil(Math.log2(commits.length))} pasos.`;
+      return;
+    }
+
+    if (btnGood) btnGood.disabled = false;
+    if (btnBad) btnBad.disabled = false;
+
+    const currentCommit = commits[currentMid];
+    if (headline) headline.textContent = isEn
+      ? `Testing Commit C${currentCommit.id} (${currentCommit.hash})`
+      : `Probando Commit C${currentCommit.id} (${currentCommit.hash})`;
+    if (subline) subline.textContent = isEn
+      ? `Git checked out midpoint C${currentCommit.id}. Run tests: does this revision work or fail?`
+      : `Git hizo checkout en el punto medio C${currentCommit.id}. Ejecuta pruebas: ¿este commit funciona o falla?`;
+  }
+
+  if (btnStart) {
+    btnStart.addEventListener('click', () => {
+      isStarted = true;
+      low = 0;
+      high = commits.length - 1;
+      currentMid = calculateMid(low, high);
+      updateView();
+    });
+  }
+
+  if (btnGood) {
+    btnGood.addEventListener('click', () => {
+      low = currentMid;
+      const node = document.getElementById(`bisect-node-${currentMid}`);
+      if (node) node.classList.add('state-good');
+      currentMid = calculateMid(low, high);
+      updateView();
+    });
+  }
+
+  if (btnBad) {
+    btnBad.addEventListener('click', () => {
+      high = currentMid;
+      const node = document.getElementById(`bisect-node-${currentMid}`);
+      if (node) node.classList.add('state-bad');
+      currentMid = calculateMid(low, high);
+      updateView();
+    });
+  }
+
+  if (btnReset) {
+    btnReset.addEventListener('click', () => {
+      isStarted = false;
+      low = 0;
+      high = commits.length - 1;
+      currentMid = -1;
+      updateView();
+    });
+  }
+
+  updateView();
+</script>

@@ -1,0 +1,125 @@
+---
+// index.astro
+import Layout from '@/layouts/Layout.astro';
+import {
+  Header,
+  NavigationSections,
+  GitPipeline,
+  TopicTabs,
+  SearchBar,
+  CommandPanel,
+  InteractiveTerminal,
+  BranchVisualizer,
+  ConflictResolver,
+  GitBisectSimulator,
+  GitRescueSection,
+  WorkflowsSection,
+  ComparisonsSection,
+  CommandBuilder,
+  ConventionalCommitBuilder,
+  GitignoreBuilder,
+  GitAliasesVault,
+  GitHooksHub,
+  GitInternals,
+  GitGlossary,
+  GitQuiz,
+  Footer
+} from '@/components';
+---
+
+<Layout
+  title="Comandos de Git | Guía Interactiva Didáctica: Por dónde viajan tus cambios"
+  description="Aprende visualmente el ciclo de vida de Git: Pipeline interactivo, simulador de terminal en vivo, árbol de ramas merge vs rebase, resolución de conflictos, git bisect, aliases pro, git hooks, arquitectura interna, glosario y quiz."
+  lang="es"
+>
+  <Header lang="es" />
+
+  <!-- Interactive Workspace Hub Navigation -->
+  <NavigationSections lang="es" />
+
+  <!-- Hub Content Views -->
+  <main class="hub-content-area">
+    <!-- View 1: Pipeline & Command Reference -->
+    <div class="hub-view-container" id="view-pipeline" data-view-id="pipeline">
+      <section id="seccion-pipeline" class="view-section" aria-label="Pipeline interactivo y buscador de comandos">
+        <GitPipeline lang="es" />
+        <TopicTabs lang="es" />
+        <SearchBar lang="es" />
+        <CommandPanel lang="es" />
+      </section>
+    </div>
+
+    <!-- View 2: Visual Simulators (Terminal, Branch Tree, Conflicts & Bisect) -->
+    <div class="hub-view-container" id="view-simuladores" data-view-id="simuladores" hidden>
+      <InteractiveTerminal lang="es" />
+      <BranchVisualizer lang="es" />
+      <ConflictResolver lang="es" />
+      <GitBisectSimulator lang="es" />
+    </div>
+
+    <!-- View 3: Practical Guides & Emergency Rescue -->
+    <div class="hub-view-container" id="view-guias" data-view-id="guias" hidden>
+      <GitRescueSection lang="es" />
+      <WorkflowsSection lang="es" />
+      <ComparisonsSection lang="es" />
+    </div>
+
+    <!-- View 4: Builders, Pro Aliases & Git Hooks -->
+    <div class="hub-view-container" id="view-herramientas" data-view-id="herramientas" hidden>
+      <CommandBuilder lang="es" />
+      <ConventionalCommitBuilder lang="es" />
+      <GitignoreBuilder lang="es" />
+      <GitAliasesVault lang="es" />
+      <GitHooksHub lang="es" />
+    </div>
+
+    <!-- View 5: Internal Architecture, Glossary & Interactive Quiz -->
+    <div class="hub-view-container" id="view-glosario-quiz" data-view-id="glosario-quiz" hidden>
+      <GitInternals lang="es" />
+      <GitGlossary lang="es" />
+      <GitQuiz lang="es" />
+    </div>
+  </main>
+
+  <Footer lang="es" />
+</Layout>
+
+<style>
+  .hub-content-area {
+    min-height: 480px;
+    position: relative;
+  }
+
+  .hub-view-container {
+    animation: fadeInView 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hub-view-container[hidden] {
+    display: none;
+  }
+
+  @keyframes fadeInView {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hub-view-container {
+      animation: none;
+    }
+  }
+
+  .view-section {
+    scroll-margin-top: 5rem;
+  }
+</style>
+
+<script>
+  import '@/scripts/mainApp';
+</script>

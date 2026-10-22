@@ -1,0 +1,432 @@
+---
+// GitQuiz.astro
+import { gitQuizQuestions as gitQuizQuestionsEs } from '../data/gitEducationalData';
+import { gitQuizQuestionsEn } from '../data/en/gitEducationalData';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const questions = isEn ? gitQuizQuestionsEn : gitQuizQuestionsEs;
+---
+
+<section id="seccion-quiz" class="quiz-section" aria-label={isEn ? "Interactive Git quiz and mini challenges" : "Mini retos y quiz didáctico de Git"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-quiz">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+      </svg>
+      <span>{isEn ? 'Test Your Knowledge' : 'Ponte a Prueba'}</span>
+    </div>
+    <div class="quiz-header-row">
+      <div>
+        <h2 class="section-heading">{isEn ? 'Interactive Mini Challenges' : 'Mini Retos Didácticos'}</h2>
+        <p class="section-sub">
+          {isEn
+            ? 'Test your intuition about Git workflows with these practical scenarios.'
+            : 'Pon a prueba tu intuición sobre el flujo de Git con estos 5 escenarios prácticos.'}
+        </p>
+      </div>
+
+      <div class="score-card">
+        <span class="score-label">{isEn ? 'Your score:' : 'Tu puntuación:'}</span>
+        <div class="score-numbers">
+          <span id="quiz-score-val" class="score-val">0</span>
+          <span class="score-total">/ {questions.length}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="questions-list">
+    {questions.map((q) => (
+      <article class="question-card" id={`q-card-${q.id}`} data-qid={q.id}>
+        <div class="question-meta">
+          <span class="q-badge">{isEn ? `Challenge ${q.id} of ${questions.length}` : `Reto ${q.id} de ${questions.length}`}</span>
+        </div>
+
+        <div class="scenario-box">
+          <div class="scenario-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{isEn ? 'Scenario:' : 'Escenario:'}</span>
+          </div>
+          <p class="scenario-text">{q.scenario}</p>
+        </div>
+
+        <h3 class="q-title">{q.question}</h3>
+
+        <div class="options-grid" role="group" aria-label={isEn ? `Options for challenge ${q.id}` : `Opciones para el reto ${q.id}`}>
+          {q.options.map((opt, optIdx) => (
+            <button
+              type="button"
+              class="option-btn"
+              data-correct={opt.isCorrect ? 'true' : 'false'}
+              data-explanation={opt.explanation}
+              data-opt-id={`${q.id}-${optIdx}`}
+            >
+              <span class="opt-letter">{String.fromCharCode(65 + optIdx)}</span>
+              <span class="opt-text">{opt.label}</span>
+              <span class="opt-result-icon" aria-hidden="true"></span>
+            </button>
+          ))}
+        </div>
+
+        <div class="explanation-box" id={`exp-${q.id}`} hidden>
+          <div class="exp-header">
+            <span class="exp-status-icon" aria-hidden="true"></span>
+            <strong class="exp-title">{isEn ? 'Technical explanation:' : 'Explicación técnica:'}</strong>
+          </div>
+          <p class="exp-body"></p>
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <div class="quiz-footer-actions">
+    <button type="button" id="reset-quiz-btn" class="quiz-reset-btn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="1 4 1 10 7 10"></polyline>
+        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+      </svg>
+      <span>{isEn ? 'Restart evaluation' : 'Reiniciar autoevaluación'}</span>
+    </button>
+  </div>
+</section>
+
+<style>
+  .quiz-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-quiz {
+    color: var(--accent-emerald);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+  }
+
+  .quiz-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .score-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-medium);
+    border-radius: 0.85rem;
+    padding: 0.65rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .score-label {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .score-numbers {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  .score-val {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent-emerald);
+    line-height: 1;
+  }
+
+  .score-total {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+
+  /* Question Cards */
+  .questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .question-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 1.75rem 1.5rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  .question-meta {
+    margin-bottom: 0.75rem;
+  }
+
+  .q-badge {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+  }
+
+  .scenario-box {
+    background: var(--bg-secondary);
+    border-left: 3px solid var(--accent-cyan);
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 0.75rem 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .scenario-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+
+  .scenario-text {
+    font-size: 0.875rem;
+    color: var(--text-main);
+    line-height: 1.45;
+  }
+
+  .q-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 1.25rem;
+    line-height: 1.35;
+  }
+
+  /* Options */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .option-btn {
+    all: unset;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 1.15rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    background: var(--bg-card-hover);
+    border-color: var(--border-medium);
+    transform: translateY(-1px);
+  }
+
+  .opt-letter {
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .opt-text {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  /* Selected States */
+  .option-btn.opt-correct {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: var(--accent-emerald) !important;
+    color: #ffffff;
+    animation: popCorrect 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .option-btn.opt-correct .opt-letter {
+    background: var(--accent-emerald);
+    color: #070b14;
+    border-color: var(--accent-emerald);
+  }
+
+  .option-btn.opt-incorrect {
+    background: rgba(244, 63, 94, 0.15) !important;
+    border-color: var(--accent-rose) !important;
+    color: #ffffff;
+    animation: shakeErr 0.35s ease-in-out;
+  }
+
+  .option-btn.opt-incorrect .opt-letter {
+    background: var(--accent-rose);
+    color: #070b14;
+    border-color: var(--accent-rose);
+  }
+
+  .option-btn:disabled {
+    cursor: default;
+    opacity: 0.85;
+  }
+
+  /* Explanation Box */
+  .explanation-box {
+    margin-top: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .exp-header {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--accent-cyan);
+  }
+
+  .exp-body {
+    font-size: 0.85rem;
+    color: var(--text-main);
+    line-height: 1.5;
+  }
+
+  /* Reset Button */
+  .quiz-footer-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .quiz-reset-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.5rem;
+    border-radius: 9999px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-medium);
+    color: var(--text-main);
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .quiz-reset-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+  }
+</style>
+
+<script>
+  let score = 0;
+  const answeredQuestions = new Set<string>();
+  const scoreDisplay = document.getElementById('quiz-score-val');
+  const questionCards = document.querySelectorAll<HTMLElement>('.question-card');
+  const resetBtn = document.getElementById('reset-quiz-btn');
+
+  questionCards.forEach(card => {
+    const qid = card.getAttribute('data-qid') || '';
+    const optionBtns = card.querySelectorAll<HTMLButtonElement>('.option-btn');
+    const expBox = card.querySelector<HTMLElement>('.explanation-box');
+    const expBody = card.querySelector<HTMLElement>('.exp-body');
+
+    optionBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (answeredQuestions.has(qid)) return;
+        answeredQuestions.add(qid);
+
+        const isCorrect = btn.getAttribute('data-correct') === 'true';
+        const explanation = btn.getAttribute('data-explanation') || '';
+
+        // Disable all options in this card
+        optionBtns.forEach(b => {
+          b.disabled = true;
+          if (b.getAttribute('data-correct') === 'true') {
+            b.classList.add('opt-correct');
+          }
+        });
+
+        if (isCorrect) {
+          score++;
+          if (scoreDisplay) scoreDisplay.textContent = String(score);
+        } else {
+          btn.classList.add('opt-incorrect');
+        }
+
+        if (expBox && expBody) {
+          expBody.textContent = explanation;
+          expBox.hidden = false;
+        }
+      });
+    });
+  });
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      score = 0;
+      answeredQuestions.clear();
+      if (scoreDisplay) scoreDisplay.textContent = '0';
+
+      questionCards.forEach(card => {
+        const optionBtns = card.querySelectorAll<HTMLButtonElement>('.option-btn');
+        const expBox = card.querySelector<HTMLElement>('.explanation-box');
+
+        optionBtns.forEach(b => {
+          b.disabled = false;
+          b.classList.remove('opt-correct', 'opt-incorrect');
+        });
+
+        if (expBox) expBox.hidden = true;
+      });
+    });
+  }
+</script>

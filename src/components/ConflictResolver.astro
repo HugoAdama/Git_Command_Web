@@ -1,0 +1,676 @@
+---
+// ConflictResolver.astro
+import { conflictScenariosEs } from '../data/gitToolsData';
+import { conflictScenariosEn } from '../data/en/gitToolsData';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const scenarios = isEn ? conflictScenariosEn : conflictScenariosEs;
+---
+
+<section id="seccion-conflictos" class="conflict-section" aria-label={isEn ? "Interactive merge conflict simulator" : "Simulador interactivo de conflictos de merge"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-conflict">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 3h5v5"></path>
+        <path d="M4 20L21 3"></path>
+        <path d="M21 16v5h-5"></path>
+        <path d="M15 15l6 6"></path>
+        <path d="M4 4l5 5"></path>
+      </svg>
+      <span>{isEn ? 'Master the Dreaded Conflict' : 'Domina el Conflicto'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Interactive Merge Conflict Resolver' : 'Simulador Interactivo de Conflictos de Merge'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Learn what actually happens when Git pauses during a merge or rebase. Practice resolving real code collisions and understand the <<<<<<< HEAD markers.'
+        : 'Aprende qué ocurre cuando Git se detiene en un merge o rebase. Practica resolviendo colisiones de código reales y comprende los marcadores <<<<<<< HEAD sin miedo.'}
+    </p>
+  </div>
+
+  <div class="conflict-card" data-scenarios-json={JSON.stringify(scenarios)} data-lang={lang}>
+    <!-- Scenario Selector Bar -->
+    <div class="scenario-selector-bar">
+      <div class="file-tabs" role="tablist" aria-label={isEn ? "Conflict files" : "Archivos con conflicto"}>
+        {scenarios.map((sc, idx) => (
+          <button
+            type="button"
+            class={`file-tab-btn ${idx === 0 ? 'active' : ''}`}
+            data-scenario-id={sc.id}
+            role="tab"
+            aria-selected={idx === 0 ? 'true' : 'false'}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+              <polyline points="13 2 13 9 20 9"></polyline>
+            </svg>
+            <span>{sc.filename}</span>
+            <span class="conflict-indicator">{isEn ? 'CONFLICT' : 'CONFLICTO'}</span>
+          </button>
+        ))}
+      </div>
+
+      <div class="branches-status">
+        <span class="branch-tag current-tag">HEAD: {scenarios[0].currentBranch}</span>
+        <span class="merge-arrow">⤹</span>
+        <span class="branch-tag incoming-tag">{scenarios[0].incomingBranch}</span>
+      </div>
+    </div>
+
+    <!-- Explanation Box -->
+    <div class="conflict-context-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <p id="conflict-desc-text">{scenarios[0].description}</p>
+    </div>
+
+    <!-- Quick Action Bar (3-way resolve buttons) -->
+    <div class="resolution-actions-bar">
+      <div class="resolve-buttons-group">
+        <button type="button" class="resolve-btn btn-accept-current" id="btn-accept-current">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>{isEn ? 'Accept Current (HEAD)' : 'Aceptar Actual (HEAD)'}</span>
+        </button>
+
+        <button type="button" class="resolve-btn btn-accept-incoming" id="btn-accept-incoming">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>{isEn ? 'Accept Incoming' : 'Aceptar Entrante'}</span>
+        </button>
+
+        <button type="button" class="resolve-btn btn-accept-both" id="btn-accept-both">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>{isEn ? 'Accept Both' : 'Conservar Ambos'}</span>
+        </button>
+      </div>
+
+      <button type="button" class="resolve-btn btn-reset-conflict" id="btn-reset-conflict" title={isEn ? "Reset conflict state" : "Reiniciar estado de conflicto"}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+        <span>{isEn ? 'Reset' : 'Reiniciar'}</span>
+      </button>
+    </div>
+
+    <!-- Visual Conflict Editor Container -->
+    <div class="code-editor-window">
+      <div class="editor-header">
+        <div class="window-dots" aria-hidden="true">
+          <span class="dot dot-close"></span>
+          <span class="dot dot-minimize"></span>
+          <span class="dot dot-expand"></span>
+        </div>
+        <span class="editor-filename" id="editor-active-filename">{scenarios[0].filename}</span>
+        <span class="status-pill" id="editor-status-pill">{isEn ? 'UNRESOLVED' : 'NO RESUELTO'}</span>
+      </div>
+
+      <div class="editor-viewport" id="editor-content-area">
+        <!-- Injected via client script -->
+      </div>
+    </div>
+
+    <!-- Command Steps Footer -->
+    <div class="conflict-terminal-guide">
+      <span class="guide-title">{isEn ? 'Terminal commands to finalize:' : 'Comandos de consola para finalizar:'}</span>
+      <div class="steps-row">
+        <div class="step-card">
+          <span class="step-num">1</span>
+          <div class="step-content">
+            <small>{isEn ? 'Stage resolved file' : 'Registrar archivo resuelto'}</small>
+            <div class="step-cmd-line">
+              <code id="cmd-step-add">git add src/config/auth.ts</code>
+              <button type="button" class="copy-btn copy-btn-sm" data-copy="git add src/config/auth.ts" aria-label="Copy step 1">
+                <svg class="copy-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <svg class="check-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <span class="step-num">2</span>
+          <div class="step-content">
+            <small>{isEn ? 'Complete merge commit' : 'Concluir el commit de merge'}</small>
+            <div class="step-cmd-line">
+              <code>git merge --continue</code>
+              <button type="button" class="copy-btn copy-btn-sm" data-copy="git merge --continue" aria-label="Copy step 2">
+                <svg class="copy-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <svg class="check-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card step-abort">
+          <span class="step-num">SOS</span>
+          <div class="step-content">
+            <small>{isEn ? 'Panic! Abort everything safely' : '¡Pánico! Abortar sin cambios'}</small>
+            <div class="step-cmd-line">
+              <code>git merge --abort</code>
+              <button type="button" class="copy-btn copy-btn-sm" data-copy="git merge --abort" aria-label="Copy abort">
+                <svg class="copy-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <svg class="check-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .conflict-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-conflict {
+    color: var(--accent-rose);
+    background: rgba(244, 63, 94, 0.12);
+    border: 1px solid rgba(244, 63, 94, 0.25);
+  }
+
+  .conflict-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 1.75rem;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .scenario-selector-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 1rem;
+  }
+
+  .file-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .file-tab-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 0.6rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+
+  .file-tab-btn:hover {
+    color: var(--text-main);
+    border-color: var(--border-medium);
+  }
+
+  .file-tab-btn.active {
+    background: rgba(56, 189, 248, 0.12);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+  }
+
+  .conflict-indicator {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    background: rgba(244, 63, 94, 0.2);
+    color: var(--accent-rose);
+  }
+
+  .branches-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.775rem;
+  }
+
+  .branch-tag {
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-weight: 600;
+  }
+
+  .current-tag {
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+  }
+
+  .incoming-tag {
+    background: rgba(168, 85, 247, 0.15);
+    color: var(--accent-purple);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+  }
+
+  .merge-arrow {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+  }
+
+  .conflict-context-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .conflict-context-box svg {
+    color: var(--accent-cyan);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .resolution-actions-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .resolve-buttons-group {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .resolve-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: 0.65rem;
+    font-family: var(--font-display);
+    font-size: 0.825rem;
+    font-weight: 600;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .resolve-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-accept-current:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+  }
+
+  .btn-accept-incoming:hover {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: var(--accent-purple);
+    color: var(--accent-purple);
+  }
+
+  .btn-accept-both:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--accent-emerald);
+    color: var(--accent-emerald);
+  }
+
+  .btn-reset-conflict:hover {
+    background: rgba(244, 63, 94, 0.15);
+    border-color: var(--accent-rose);
+    color: var(--accent-rose);
+  }
+
+  /* Code Editor Window */
+  .code-editor-window {
+    background: #070b14;
+    border: 1px solid #1e293b;
+    border-radius: 0.85rem;
+    overflow: hidden;
+    box-shadow: 0 8px 24px -5px rgba(0, 0, 0, 0.6);
+  }
+
+  .editor-header {
+    background: #0f172a;
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #1e293b;
+  }
+
+  .window-dots {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .dot-close { background: #ef4444; }
+  .dot-minimize { background: #f59e0b; }
+  .dot-expand { background: #10b981; }
+
+  .editor-filename {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
+
+  .status-pill {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    background: rgba(244, 63, 94, 0.2);
+    color: var(--accent-rose);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+  }
+
+  .status-pill.resolved {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-emerald);
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+
+  .editor-viewport {
+    padding: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  /* Marker Styling */
+  :global(.conflict-marker-head) {
+    display: block;
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-cyan);
+    padding: 0.2rem 0.5rem;
+    border-left: 3px solid var(--accent-cyan);
+    font-weight: 700;
+    margin: 0.4rem 0;
+  }
+
+  :global(.conflict-marker-split) {
+    display: block;
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+    padding: 0.2rem 0.5rem;
+    border-left: 3px solid #64748b;
+    font-weight: 700;
+    margin: 0.4rem 0;
+  }
+
+  :global(.conflict-marker-tail) {
+    display: block;
+    background: rgba(168, 85, 247, 0.15);
+    color: var(--accent-purple);
+    padding: 0.2rem 0.5rem;
+    border-left: 3px solid var(--accent-purple);
+    font-weight: 700;
+    margin: 0.4rem 0;
+  }
+
+  :global(.conflict-block-current) {
+    display: block;
+    background: rgba(56, 189, 248, 0.05);
+    color: #e2e8f0;
+    padding-left: 0.75rem;
+  }
+
+  :global(.conflict-block-incoming) {
+    display: block;
+    background: rgba(168, 85, 247, 0.05);
+    color: #e2e8f0;
+    padding-left: 0.75rem;
+  }
+
+  :global(.resolved-clean-code) {
+    display: block;
+    color: #f8fafc;
+    background: rgba(16, 185, 129, 0.04);
+    padding: 0.5rem;
+    border-left: 3px solid var(--accent-emerald);
+  }
+
+  /* Terminal Guide */
+  .conflict-terminal-guide {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1rem;
+  }
+
+  .guide-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .steps-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .step-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .step-abort .step-num {
+    background: rgba(244, 63, 94, 0.15);
+    color: var(--accent-rose);
+    font-size: 0.65rem;
+  }
+
+  .step-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .step-content small {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .step-cmd-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .step-cmd-line code {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+  }
+
+  @media (max-width: 768px) {
+    .conflict-card {
+      padding: 1.25rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  import type { ConflictScenario } from '../data/gitToolsData';
+
+  const card = document.querySelector<HTMLElement>('.conflict-card');
+  const scenariosData: ConflictScenario[] = card?.dataset.scenariosJson ? JSON.parse(card.dataset.scenariosJson) : [];
+  const isEn = card?.dataset.lang === 'en';
+
+  let currentScenarioIndex = 0;
+  let resolutionState: 'unresolved' | 'current' | 'incoming' | 'both' = 'unresolved';
+
+  const fileTabs = document.querySelectorAll<HTMLButtonElement>('.file-tab-btn');
+  const descText = document.getElementById('conflict-desc-text');
+  const activeFilename = document.getElementById('editor-active-filename');
+  const statusPill = document.getElementById('editor-status-pill');
+  const editorArea = document.getElementById('editor-content-area');
+  const cmdStepAdd = document.getElementById('cmd-step-add');
+
+  const btnCurrent = document.getElementById('btn-accept-current');
+  const btnIncoming = document.getElementById('btn-accept-incoming');
+  const btnBoth = document.getElementById('btn-accept-both');
+  const btnReset = document.getElementById('btn-reset-conflict');
+
+  function renderConflict() {
+    const sc = scenariosData[currentScenarioIndex];
+    if (!sc || !editorArea || !statusPill) return;
+
+    if (activeFilename) activeFilename.textContent = sc.filename;
+    if (descText) descText.textContent = sc.description;
+    if (cmdStepAdd) {
+      cmdStepAdd.textContent = `git add ${sc.filename}`;
+      const copyBtn = cmdStepAdd.parentElement?.querySelector('.copy-btn');
+      if (copyBtn) copyBtn.setAttribute('data-copy', `git add ${sc.filename}`);
+    }
+
+    if (resolutionState === 'unresolved') {
+      statusPill.textContent = isEn ? 'UNRESOLVED' : 'NO RESUELTO';
+      statusPill.classList.remove('resolved');
+
+      editorArea.innerHTML = `
+        <span class="conflict-marker-head">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD (${sc.currentBranch})</span>
+        <pre class="conflict-block-current">${escapeHtml(sc.currentCode)}</pre>
+        <span class="conflict-marker-split">=======</span>
+        <pre class="conflict-block-incoming">${escapeHtml(sc.incomingCode)}</pre>
+        <span class="conflict-marker-tail">&gt;&gt;&gt;&gt;&gt;&gt;&gt; ${sc.incomingBranch}</span>
+      `;
+    } else if (resolutionState === 'current') {
+      statusPill.textContent = isEn ? 'RESOLVED (HEAD)' : 'RESUELTO (HEAD)';
+      statusPill.classList.add('resolved');
+      editorArea.innerHTML = `<pre class="resolved-clean-code">${escapeHtml(sc.currentCode)}</pre>`;
+    } else if (resolutionState === 'incoming') {
+      statusPill.textContent = isEn ? 'RESOLVED (INCOMING)' : 'RESUELTO (ENTRANTE)';
+      statusPill.classList.add('resolved');
+      editorArea.innerHTML = `<pre class="resolved-clean-code">${escapeHtml(sc.incomingCode)}</pre>`;
+    } else if (resolutionState === 'both') {
+      statusPill.textContent = isEn ? 'RESOLVED (BOTH)' : 'RESUELTO (AMBOS)';
+      statusPill.classList.add('resolved');
+      editorArea.innerHTML = `<pre class="resolved-clean-code">${escapeHtml(sc.currentCode)}\n\n${escapeHtml(sc.incomingCode)}</pre>`;
+    }
+  }
+
+  function escapeHtml(str: string) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  fileTabs.forEach((tab, idx) => {
+    tab.addEventListener('click', () => {
+      fileTabs.forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      currentScenarioIndex = idx;
+      resolutionState = 'unresolved';
+      renderConflict();
+    });
+  });
+
+  if (btnCurrent) {
+    btnCurrent.addEventListener('click', () => {
+      resolutionState = 'current';
+      renderConflict();
+    });
+  }
+
+  if (btnIncoming) {
+    btnIncoming.addEventListener('click', () => {
+      resolutionState = 'incoming';
+      renderConflict();
+    });
+  }
+
+  if (btnBoth) {
+    btnBoth.addEventListener('click', () => {
+      resolutionState = 'both';
+      renderConflict();
+    });
+  }
+
+  if (btnReset) {
+    btnReset.addEventListener('click', () => {
+      resolutionState = 'unresolved';
+      renderConflict();
+    });
+  }
+
+  renderConflict();
+</script>

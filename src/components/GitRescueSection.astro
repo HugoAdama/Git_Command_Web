@@ -1,0 +1,588 @@
+---
+// GitRescueSection.astro
+import { gitSosScenarios as gitSosScenariosEs } from '../data/gitEducationalData';
+import { gitSosScenariosEn } from '../data/en/gitEducationalData';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const scenarios = isEn ? gitSosScenariosEn : gitSosScenariosEs;
+const rawBase = import.meta.env.BASE_URL;
+const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+---
+
+<section id="seccion-rescate" class="rescue-section" aria-label={isEn ? "Git emergency rescue mode" : "Modo rescate de emergencias de Git"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-rescue">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{isEn ? 'Git SOS — Rescue Mode' : 'Git SOS — Modo Rescate'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Messed Up? Here Is Your Safety Net' : '¿Metiste la pata? Aquí está la solución'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Git mistakes happen to everyone. Find your exact scenario and follow verified steps to recover your code without panicking.'
+        : 'Los errores en Git le pasan a todo el mundo. Encuentra tu escenario exacto y sigue los pasos comprobados para recuperar tu código sin pánico.'}
+    </p>
+  </div>
+
+  <!-- Rescue Hero Station Illustration Banner -->
+  <div class="rescue-hero-banner">
+    <div class="rescue-banner-info">
+      <span class="rescue-banner-tag">{isEn ? 'Safety Protocol' : 'Protocolo de Rescate'}</span>
+      <h3 class="rescue-banner-title">{isEn ? 'Zero-Panic Repository Safety Station' : 'Estación de Seguridad sin Pánico'}</h3>
+      <p class="rescue-banner-desc">
+        {isEn
+          ? 'Commits in Git are virtually indestructible snapshots. Follow verified step-by-step procedures to recover detached HEADs, undo faulty merges, or uncommit accidental secrets without losing work.'
+          : 'Los commits en Git son instantáneas matemáticamente casi indestructibles. Sigue procedimientos paso a paso comprobados para recuperar HEADs desacoplados, deshacer merges conflictivos o limpiar secretos sin perder trabajo.'}
+      </p>
+    </div>
+    <div class="rescue-banner-media">
+      <img
+        src={`${baseUrl}images/git-rescue-station.jpg`}
+        alt={isEn ? "Git Emergency Rescue and Debugging Station" : "Estación de Rescate y Depuración de Emergencias de Git"}
+        class="rescue-banner-img"
+        loading="lazy"
+        width="480"
+        height="270"
+      />
+    </div>
+  </div>
+
+  <!-- Category Filter Bar -->
+  <div class="rescue-filter-bar" role="tablist" aria-label={isEn ? "SOS scenario category filters" : "Filtro de escenarios SOS"}>
+    <button type="button" class="sos-filter-btn active" data-category="todos">
+      <span>{isEn ? 'All Scenarios' : 'Todos los casos'}</span>
+      <span class="count-badge">{scenarios.length}</span>
+    </button>
+    <button type="button" class="sos-filter-btn" data-category="commits">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <line x1="1.05" y1="12" x2="7" y2="12"></line>
+        <line x1="17.01" y1="12" x2="22.96" y2="12"></line>
+      </svg>
+      <span>Commits</span>
+    </button>
+    <button type="button" class="sos-filter-btn" data-category="ramas">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <line x1="6" y1="3" x2="6" y2="15"></line>
+        <circle cx="18" cy="6" r="3"></circle>
+        <circle cx="6" cy="18" r="3"></circle>
+        <path d="M18 9a9 9 0 0 1-9 9"></path>
+      </svg>
+      <span>{isEn ? 'Branches' : 'Ramas'}</span>
+    </button>
+    <button type="button" class="sos-filter-btn" data-category="archivos">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+        <polyline points="13 2 13 9 20 9"></polyline>
+      </svg>
+      <span>{isEn ? 'Files & Secrets' : 'Archivos & Secretos'}</span>
+    </button>
+    <button type="button" class="sos-filter-btn" data-category="conflictos">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+      </svg>
+      <span>{isEn ? 'Conflicts' : 'Conflictos'}</span>
+    </button>
+  </div>
+
+  <!-- Scenarios Grid -->
+  <div class="scenarios-grid">
+    {scenarios.map((item) => (
+      <article class="sos-card" data-cat={item.category}>
+        <div class="sos-card-header">
+          <div class="sos-badges">
+            <span class={`severity-badge severity-${item.severity}`}>
+              <span class="severity-dot" aria-hidden="true"></span>
+              Riesgo {item.severity}
+            </span>
+            <span class="category-tag">{item.category}</span>
+          </div>
+          <h3 class="sos-title">{item.title}</h3>
+          <p class="sos-subtitle">{item.subtitle}</p>
+        </div>
+
+        <div class="problem-box">
+          <div class="problem-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>Situación:</span>
+          </div>
+          <p class="problem-text">{item.problem}</p>
+        </div>
+
+        <div class="solution-wrap">
+          <div class="solution-heading">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Pasos de solución:</span>
+          </div>
+
+          <div class="steps-flow">
+            {item.steps.map((st, idx) => (
+              <div class="step-card">
+                <div class="step-num-bubble">{idx + 1}</div>
+                <div class="step-content">
+                  <div class="step-cmd-row">
+                    <code class="step-code">{st.command}</code>
+                    <button
+                      type="button"
+                      class="copy-btn copy-btn-sm"
+                      data-copy={st.command}
+                      aria-label={`Copiar ${st.command}`}
+                    >
+                      <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      <svg class="check-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      <span class="btn-text">Copiar</span>
+                    </button>
+                  </div>
+                  <p class="step-explanation">{st.explanation}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {item.tip && (
+          <div class="notice-box notice-tip">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <p>{item.tip}</p>
+          </div>
+        )}
+
+        {item.dangerNotice && (
+          <div class="notice-box notice-danger">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <p>{item.dangerNotice}</p>
+          </div>
+        )}
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .rescue-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-rescue {
+    color: var(--accent-rose);
+    background: rgba(244, 63, 94, 0.12);
+    border: 1px solid rgba(244, 63, 94, 0.25);
+  }
+
+  /* Rescue Hero Banner */
+  .rescue-hero-banner {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem 1.75rem;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.65));
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    border-radius: 1.25rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.45), 0 0 20px -3px rgba(244, 63, 94, 0.15);
+  }
+
+  .rescue-banner-tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-rose);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    margin-bottom: 0.4rem;
+  }
+
+  .rescue-banner-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+  }
+
+  .rescue-banner-desc {
+    color: var(--text-muted);
+    font-size: 0.925rem;
+    line-height: 1.55;
+  }
+
+  .rescue-banner-media {
+    border-radius: 0.85rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-md);
+    aspect-ratio: 16 / 9;
+  }
+
+  .rescue-banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .rescue-hero-banner:hover .rescue-banner-img {
+    transform: scale(1.03);
+  }
+
+  @media (max-width: 860px) {
+    .rescue-hero-banner {
+      grid-template-columns: 1fr;
+      padding: 1.25rem;
+      gap: 1.25rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .scenarios-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .sos-card {
+      padding: 1.25rem 1rem;
+    }
+
+    .rescue-filter-bar {
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-wrap: nowrap;
+      padding-bottom: 0.4rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .rescue-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .sos-filter-btn {
+      flex: 0 0 auto;
+    }
+  }
+
+  /* Filter Bar */
+  .rescue-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-bottom: 2rem;
+  }
+
+  .sos-filter-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 1rem;
+    border-radius: 9999px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .sos-filter-btn:hover {
+    color: var(--text-main);
+    border-color: var(--border-medium);
+  }
+
+  .sos-filter-btn.active {
+    background: rgba(244, 63, 94, 0.15);
+    border-color: var(--accent-rose);
+    color: var(--accent-rose);
+  }
+
+  .count-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.1rem 0.4rem;
+    border-radius: 9999px;
+  }
+
+  /* Grid */
+  .scenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+    gap: 1.5rem;
+  }
+
+  .sos-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.15rem;
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .sos-card:hover {
+    border-color: var(--border-medium);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .sos-card[hidden] {
+    display: none;
+  }
+
+  .sos-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .severity-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+  }
+
+  .severity-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .severity-baja {
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--accent-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+  }
+  .severity-baja .severity-dot { background: var(--accent-emerald); }
+
+  .severity-media {
+    background: rgba(250, 204, 21, 0.12);
+    color: var(--accent-gold);
+    border: 1px solid rgba(250, 204, 21, 0.25);
+  }
+  .severity-media .severity-dot { background: var(--accent-gold); }
+
+  .severity-alta {
+    background: rgba(244, 63, 94, 0.12);
+    color: var(--accent-rose);
+    border: 1px solid rgba(244, 63, 94, 0.25);
+  }
+  .severity-alta .severity-dot { background: var(--accent-rose); }
+
+  .category-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .sos-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text-main);
+    line-height: 1.3;
+    margin-bottom: 0.25rem;
+  }
+
+  .sos-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  /* Problem Box */
+  .problem-box {
+    background: var(--bg-secondary);
+    border-left: 3px solid var(--accent-rose);
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 0.75rem 0.9rem;
+  }
+
+  .problem-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    font-weight: 700;
+    color: var(--accent-rose);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+
+  .problem-text {
+    font-size: 0.85rem;
+    color: var(--text-main);
+    line-height: 1.45;
+  }
+
+  /* Solution Steps */
+  .solution-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.775rem;
+    font-weight: 700;
+    color: var(--accent-emerald);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .steps-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .step-card {
+    display: flex;
+    gap: 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.65rem;
+    padding: 0.75rem;
+  }
+
+  .step-num-bubble {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .step-cmd-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .step-code {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    overflow-wrap: anywhere;
+  }
+
+  .copy-btn-sm {
+    padding: 0.25rem 0.55rem;
+    min-width: 4.8rem;
+    font-size: 0.75rem;
+    gap: 0.3rem;
+  }
+
+  .step-explanation {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* Notices */
+  .notice-box {
+    display: flex;
+    gap: 0.65rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.65rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .notice-box svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .notice-tip {
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    color: var(--accent-cyan);
+  }
+
+  .notice-danger {
+    background: rgba(244, 63, 94, 0.08);
+    border: 1px solid rgba(244, 63, 94, 0.25);
+    color: var(--accent-rose);
+  }
+</style>
+
+<script>
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.sos-filter-btn');
+  const cards = document.querySelectorAll<HTMLElement>('.sos-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const cat = btn.getAttribute('data-category');
+      cards.forEach(card => {
+        const cardCat = card.getAttribute('data-cat');
+        if (cat === 'todos' || cardCat === cat) {
+          card.hidden = false;
+        } else {
+          card.hidden = true;
+        }
+      });
+    });
+  });
+</script>

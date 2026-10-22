@@ -1,0 +1,128 @@
+---
+// SearchBar.astro
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+---
+
+<div class="search-wrapper">
+  <div class="search-input-box">
+    <div class="search-icon" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </div>
+    <input
+      type="search"
+      id="command-search"
+      placeholder={isEn ? "Search command or keyword (e.g. stash, revert, branch, commit)..." : "Buscar comando o acción (ej. stash, revert, branch, commit)..."}
+      aria-label={isEn ? "Search Git commands" : "Buscar comandos de Git"}
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <div class="search-shortcut" title={isEn ? "Press / or Ctrl+K to search" : "Presiona / o Ctrl+K para buscar"}>
+      <kbd>/</kbd>
+    </div>
+    <button type="button" id="clear-search" class="clear-btn" aria-label={isEn ? "Clear search" : "Limpiar búsqueda"} hidden>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <div id="search-feedback" class="search-feedback" aria-live="polite"></div>
+</div>
+
+<style>
+  .search-wrapper {
+    margin: 1.5rem 0 2.25rem;
+    position: relative;
+  }
+
+  .search-input-box {
+    display: flex;
+    align-items: center;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-medium);
+    border-radius: 0.85rem;
+    padding: 0.4rem 0.85rem;
+    gap: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .search-input-box:focus-within {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2), var(--shadow-md);
+  }
+
+  .search-icon {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+  }
+
+  #command-search {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    outline: none;
+    padding: 0.5rem 0;
+  }
+
+  #command-search::placeholder {
+    color: var(--text-dim);
+  }
+
+  .search-shortcut {
+    display: flex;
+    align-items: center;
+  }
+
+  kbd {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-medium);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .clear-btn {
+    all: unset;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.06);
+    transition: all 0.2s;
+  }
+
+  .clear-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .search-feedback {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    padding: 0 0.5rem;
+    min-height: 1.2rem;
+  }
+</style>

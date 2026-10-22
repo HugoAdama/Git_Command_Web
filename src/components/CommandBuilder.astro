@@ -1,0 +1,354 @@
+---
+// CommandBuilder.astro
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+---
+
+<section id="seccion-generador" class="builder-section" aria-label={isEn ? "Interactive Git command generator" : "Generador interactivo de comandos de Git"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-builder">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+      <span>{isEn ? 'Smart Assistant' : 'Asistente Inteligente'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Assisted Command Generator' : 'Generador Asistido de Comandos'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Fill in your parameters and get exact commands ready to paste into your terminal, following production-grade best practices.'
+        : 'Completa tus datos y obtén comandos exactos listos para copiar y pegar en tu terminal, siguiendo las mejores prácticas de la industria.'}
+    </p>
+  </div>
+
+  <div class="builders-grid">
+    <!-- Tool 1: Branch Creator -->
+    <div class="builder-card">
+      <div class="builder-header">
+        <span class="tool-tag">{isEn ? 'Tool 1' : 'Herramienta 1'}</span>
+        <h3 class="builder-title">{isEn ? 'Semantic Branch Name Builder' : 'Generador de Ramas Semánticas'}</h3>
+        <p class="builder-desc">{isEn ? 'Create clean branches following conventional naming standards.' : 'Crea ramas con nomenclatura estandarizada según el propósito del trabajo.'}</p>
+      </div>
+
+      <div class="builder-form">
+        <div class="input-group">
+          <label for="branch-type">{isEn ? 'Task type' : 'Tipo de tarea'}</label>
+          <select id="branch-type" class="form-select">
+            <option value="feat/">feat/ {isEn ? '(New feature)' : '(Nueva funcionalidad)'}</option>
+            <option value="fix/">fix/ {isEn ? '(Bug fix)' : '(Corrección de error)'}</option>
+            <option value="docs/">docs/ {isEn ? '(Documentation)' : '(Cambios en documentación)'}</option>
+            <option value="refactor/">refactor/ {isEn ? '(Refactoring without logic change)' : '(Mejora de código sin alterar lógica)'}</option>
+            <option value="test/">test/ {isEn ? '(Tests)' : '(Agregar o reparar pruebas)'}</option>
+            <option value="chore/">chore/ {isEn ? '(Maintenance & deps)' : '(Mantenimiento de dependencias)'}</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="branch-name">{isEn ? 'Descriptive slug (kebab-case)' : 'Nombre descriptivo (kebab-case)'}</label>
+          <input
+            type="text"
+            id="branch-name"
+            class="form-input"
+            placeholder={isEn ? "e.g. google-login, mobile-navbar" : "ej. login-google, navbar-mobile"}
+            value={isEn ? "oauth-authentication" : "autenticacion-oauth"}
+          />
+        </div>
+      </div>
+
+      <div class="generated-box">
+        <span class="gen-label">{isEn ? 'Command ready to run:' : 'Comando listo para ejecutar:'}</span>
+        <div class="gen-code-row">
+          <span class="prompt-sym">$</span>
+          <code id="gen-branch-code" class="gen-code">{isEn ? 'git switch -c feat/oauth-authentication' : 'git switch -c feat/autenticacion-oauth'}</code>
+          <button
+            type="button"
+            class="copy-btn copy-btn-sm"
+            id="copy-branch-btn"
+            data-copy={isEn ? "git switch -c feat/oauth-authentication" : "git switch -c feat/autenticacion-oauth"}
+          >
+            <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <svg class="check-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="btn-text">{isEn ? 'Copy' : 'Copiar'}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tool 2: First Repo Publisher -->
+    <div class="builder-card">
+      <div class="builder-header">
+        <span class="tool-tag">{isEn ? 'Tool 2' : 'Herramienta 2'}</span>
+        <h3 class="builder-title">{isEn ? 'First Repository Sequence' : 'Secuencia de Primer Repositorio'}</h3>
+        <p class="builder-desc">{isEn ? 'Generates the complete set of commands to publish a local project directly to GitHub in one run.' : 'Genera el bloque completo de comandos para publicar un proyecto local en GitHub de una sola vez.'}</p>
+      </div>
+
+      <div class="builder-form">
+        <div class="input-group">
+          <label for="repo-url">{isEn ? 'Remote repository URL (HTTPS or SSH)' : 'URL del repositorio remoto (HTTPS o SSH)'}</label>
+          <input
+            type="text"
+            id="repo-url"
+            class="form-input"
+            placeholder={isEn ? "https://github.com/username/my-repo.git" : "https://github.com/usuario/mi-repo.git"}
+            value={isEn ? "https://github.com/my-user/my-project.git" : "https://github.com/mi-usuario/mi-proyecto.git"}
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="repo-branch">{isEn ? 'Default branch name' : 'Rama principal'}</label>
+          <input
+            type="text"
+            id="repo-branch"
+            class="form-input"
+            value="main"
+          />
+        </div>
+      </div>
+
+      <div class="generated-box">
+        <div class="gen-multi-header">
+          <span class="gen-label">{isEn ? 'Complete script (5 steps):' : 'Script completo (5 pasos):'}</span>
+          <button
+            type="button"
+            class="copy-btn copy-btn-sm"
+            id="copy-multi-btn"
+            data-copy=""
+          >
+            <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <svg class="check-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="btn-text">{isEn ? 'Copy full block' : 'Copiar todo el bloque'}</span>
+          </button>
+        </div>
+        <pre id="gen-multi-code" class="multi-line-code"></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .builder-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-builder {
+    color: var(--accent-gold);
+    background: rgba(250, 204, 21, 0.12);
+    border: 1px solid rgba(250, 204, 21, 0.25);
+  }
+
+  .builders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 1.5rem;
+  }
+
+  .builder-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.25rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  .tool-tag {
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+  }
+
+  .builder-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0.25rem 0 0.4rem;
+  }
+
+  .builder-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+
+  .builder-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .input-group label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .form-select,
+  .form-input {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+    border-radius: 0.65rem;
+    padding: 0.55rem 0.85rem;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .form-select:focus,
+  .form-input:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+  }
+
+  /* Generated Output Box */
+  .generated-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.85rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .gen-label {
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .gen-code-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .prompt-sym {
+    color: var(--accent-emerald);
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+
+  .gen-code {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    overflow-wrap: anywhere;
+  }
+
+  .gen-multi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .multi-line-code {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--accent-gold);
+    white-space: pre-wrap;
+    word-break: break-all;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  @media (max-width: 640px) {
+    .builders-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .builder-card {
+      padding: 1.25rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  // Tool 1: Branch builder logic
+  const branchType = document.getElementById('branch-type') as HTMLSelectElement | null;
+  const branchName = document.getElementById('branch-name') as HTMLInputElement | null;
+  const genBranchCode = document.getElementById('gen-branch-code');
+  const copyBranchBtn = document.getElementById('copy-branch-btn');
+
+  function updateBranchCommand() {
+    if (!branchType || !branchName || !genBranchCode || !copyBranchBtn) return;
+    const prefix = branchType.value;
+    const cleanName = branchName.value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+    const fullCmd = `git switch -c ${prefix}${cleanName || 'nueva-rama'}`;
+    genBranchCode.textContent = fullCmd;
+    copyBranchBtn.setAttribute('data-copy', fullCmd);
+  }
+
+  if (branchType && branchName) {
+    branchType.addEventListener('change', updateBranchCommand);
+    branchName.addEventListener('input', updateBranchCommand);
+  }
+
+  // Tool 2: First repo publisher logic
+  const repoUrlInput = document.getElementById('repo-url') as HTMLInputElement | null;
+  const repoBranchInput = document.getElementById('repo-branch') as HTMLInputElement | null;
+  const genMultiCode = document.getElementById('gen-multi-code');
+  const copyMultiBtn = document.getElementById('copy-multi-btn');
+
+  function updateRepoScript() {
+    if (!repoUrlInput || !repoBranchInput || !genMultiCode || !copyMultiBtn) return;
+    const url = repoUrlInput.value.trim() || 'https://github.com/usuario/mi-repo.git';
+    const branch = repoBranchInput.value.trim() || 'main';
+
+    const script = `git init
+git add .
+git commit -m "feat: estructura inicial del proyecto"
+git remote add origin ${url}
+git push -u origin ${branch}`;
+
+    genMultiCode.textContent = script;
+    copyMultiBtn.setAttribute('data-copy', script);
+  }
+
+  if (repoUrlInput && repoBranchInput) {
+    repoUrlInput.addEventListener('input', updateRepoScript);
+    repoBranchInput.addEventListener('input', updateRepoScript);
+    updateRepoScript();
+  }
+</script>

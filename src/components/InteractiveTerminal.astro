@@ -1,0 +1,488 @@
+---
+// InteractiveTerminal.astro
+import { terminalMockData as terminalMockDataEs } from '../data/gitEducationalData';
+import { terminalMockDataEn } from '../data/en/gitEducationalData';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const mockData = isEn ? terminalMockDataEn : terminalMockDataEs;
+const projectDir = isEn ? '~/my-project' : '~/mi-proyecto';
+---
+
+<section id="seccion-terminal" class="terminal-section" aria-label={isEn ? "Interactive terminal simulator" : "Simulador de terminal interactivo"}>
+  <div class="section-title-wrap">
+    <div class="section-badge">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="4 17 10 11 4 5"></polyline>
+        <line x1="12" y1="19" x2="20" y2="19"></line>
+      </svg>
+      <span>{isEn ? 'Interactive Playground' : 'Laboratorio Interactivo'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Live Terminal Simulator' : 'Simulador de Terminal en Vivo'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Experience the Git lifecycle in real time. Run sample commands to watch terminal outputs and follow how changes progress through pipeline stages.'
+        : 'Experimenta el ciclo de vida de Git en tiempo real. Ejecuta comandos de muestra y observa cómo responde la consola oficial y qué estado se activa en el flujo.'}
+    </p>
+  </div>
+
+  <div class="terminal-box" data-mock-json={JSON.stringify(mockData)} data-project-dir={projectDir}>
+    <!-- Terminal Header Bar -->
+    <div class="terminal-header">
+      <div class="window-dots" aria-hidden="true">
+        <span class="dot dot-close"></span>
+        <span class="dot dot-minimize"></span>
+        <span class="dot dot-expand"></span>
+      </div>
+      <div class="terminal-title">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+        <span>bash — git-demo@localhost: {projectDir} (main)</span>
+      </div>
+      <button type="button" id="terminal-reset" class="terminal-reset-btn" title={isEn ? "Reset terminal session" : "Limpiar y reiniciar terminal"}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+        <span>{isEn ? 'Reset' : 'Reiniciar'}</span>
+      </button>
+    </div>
+
+    <!-- Interactive Command Pills -->
+    <div class="command-launcher-bar">
+      <span class="launcher-label">{isEn ? 'Click to execute:' : 'Haz clic para ejecutar:'}</span>
+      <div class="launcher-pills">
+        {mockData.map((item, index) => (
+          <button
+            type="button"
+            class="launcher-btn"
+            data-index={index}
+            data-cmd={item.cmd}
+          >
+            <span class="launcher-indicator" aria-hidden="true"></span>
+            <code>{item.cmd}</code>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Terminal Screen -->
+    <div class="terminal-body" id="terminal-screen" role="region" aria-live="polite">
+      <div class="term-line prompt-line">
+        <span class="prompt-user">developer@pc</span>:<span class="prompt-path">{projectDir}</span><span class="prompt-branch"> (main)</span>$ <span class="term-cmd">git status</span>
+      </div>
+      <pre class="term-output" id="terminal-output-text">{mockData[0].output}</pre>
+      <div class="term-line active-prompt">
+        <span class="prompt-user">developer@pc</span>:<span class="prompt-path">{projectDir}</span><span class="prompt-branch"> (main)</span>$ <span class="term-cursor" aria-hidden="true">█</span>
+      </div>
+    </div>
+
+    <!-- Visual State Radar -->
+    <div class="stage-radar">
+      <span class="radar-label">{isEn ? 'Current state of your changes:' : 'Estado actual de tus cambios:'}</span>
+      <div class="radar-pills">
+        <div class="radar-item" id="radar-0">
+          <span class="radar-dot"></span>
+          <span>{isEn ? '1. Working Directory' : '1. Carpeta de trabajo'}</span>
+        </div>
+        <div class="radar-arrow">→</div>
+        <div class="radar-item" id="radar-1">
+          <span class="radar-dot"></span>
+          <span>{isEn ? '2. Staging Area' : '2. Área de preparación'}</span>
+        </div>
+        <div class="radar-arrow">→</div>
+        <div class="radar-item" id="radar-2">
+          <span class="radar-dot"></span>
+          <span>{isEn ? '3. Local Repository' : '3. Repositorio local'}</span>
+        </div>
+        <div class="radar-arrow">→</div>
+        <div class="radar-item" id="radar-3">
+          <span class="radar-dot"></span>
+          <span>{isEn ? '4. Remote' : '4. Remoto'}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .terminal-section {
+    margin: 3.5rem 0;
+    scroll-margin-top: 5rem;
+  }
+
+  .section-title-wrap {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent-emerald);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    margin-bottom: 0.65rem;
+  }
+
+  .section-heading {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+    color: var(--text-main);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-sub {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    max-width: 65ch;
+  }
+
+  /* Terminal Window */
+  .terminal-box {
+    background: #090d16;
+    border: 1.5px solid var(--border-medium);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.6);
+  }
+
+  .terminal-header {
+    background: #111827;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .window-dots {
+    display: flex;
+    gap: 0.45rem;
+  }
+
+  .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+  }
+
+  .dot-close { background: #ef4444; }
+  .dot-minimize { background: #f59e0b; }
+  .dot-expand { background: #10b981; }
+
+  .terminal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  .terminal-reset-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    color: #94a3b8;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.2s;
+  }
+
+  .terminal-reset-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  /* Launcher Bar */
+  .command-launcher-bar {
+    background: #0e1626;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .launcher-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  .launcher-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .launcher-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    background: #17233d;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    color: #f1f5f9;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+
+  .launcher-btn:hover {
+    background: #1e2f52;
+    border-color: var(--accent-cyan);
+    transform: translateY(-1px);
+  }
+
+  .launcher-btn.active {
+    background: rgba(56, 189, 248, 0.2);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+  }
+
+  .launcher-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-cyan);
+  }
+
+  /* Terminal Screen */
+  .terminal-body {
+    padding: 1.25rem 1.25rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    min-height: 220px;
+    background: #070b14;
+    color: #cbd5e1;
+    overflow-x: auto;
+  }
+
+  .term-line {
+    margin-bottom: 0.5rem;
+  }
+
+  .prompt-user {
+    color: var(--accent-emerald);
+    font-weight: 600;
+  }
+
+  .prompt-path {
+    color: var(--accent-cyan);
+  }
+
+  .prompt-branch {
+    color: var(--accent-purple);
+  }
+
+  .term-cmd {
+    color: #f8fafc;
+    font-weight: 600;
+  }
+
+  .term-output {
+    margin: 0.5rem 0 1rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: #94a3b8;
+    font-family: inherit;
+    font-size: 0.85rem;
+    animation: termFade 0.22s ease-out;
+  }
+
+  @keyframes termFade {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .term-cursor {
+    animation: blink 1s step-start infinite;
+    color: var(--accent-emerald);
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  /* Stage Radar */
+  .stage-radar {
+    background: #0b1120;
+    padding: 0.85rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .radar-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  .radar-pills {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .radar-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #64748b;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .radar-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #475569;
+    position: relative;
+    transition: background-color 0.25s ease;
+  }
+
+  .radar-item.active {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--accent-emerald);
+    color: var(--accent-emerald);
+    font-weight: 600;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    transform: translateY(-1px);
+  }
+
+  .radar-item.active .radar-dot {
+    background: var(--accent-emerald);
+    box-shadow: 0 0 6px var(--accent-emerald);
+    animation: radarPulse 1.8s infinite ease-out;
+  }
+
+  @keyframes radarPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+  }
+
+  .radar-arrow {
+    color: #475569;
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .command-launcher-bar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
+
+<script>
+  const termBox = document.querySelector<HTMLElement>('.terminal-box');
+  const mockJson = termBox?.getAttribute('data-mock-json');
+  const projectDir = termBox?.getAttribute('data-project-dir') || '~/mi-proyecto';
+  const terminalData = mockJson ? JSON.parse(mockJson) : [];
+
+  const launcherBtns = document.querySelectorAll<HTMLButtonElement>('.launcher-btn');
+  const termScreen = document.getElementById('terminal-screen');
+  const termResetBtn = document.getElementById('terminal-reset');
+  const radarItems = [
+    document.getElementById('radar-0'),
+    document.getElementById('radar-1'),
+    document.getElementById('radar-2'),
+    document.getElementById('radar-3')
+  ];
+
+  function activateRadar(index: number) {
+    radarItems.forEach((item, i) => {
+      if (item) {
+        item.classList.toggle('active', i === index);
+      }
+    });
+  }
+
+  function runMockCommand(index: number) {
+    const data = terminalData[index];
+    if (!data || !termScreen) return;
+
+    launcherBtns.forEach((btn, i) => {
+      btn.classList.toggle('active', i === index);
+    });
+
+    activateRadar(data.stageActive);
+
+    termScreen.innerHTML = `
+      <div class="term-line prompt-line">
+        <span class="prompt-user">developer@pc</span>:<span class="prompt-path">${projectDir}</span><span class="prompt-branch"> (main)</span>$ <span class="term-cmd">${data.cmd}</span>
+      </div>
+      <pre class="term-output">${data.output}</pre>
+      <div class="term-line active-prompt">
+        <span class="prompt-user">developer@pc</span>:<span class="prompt-path">${projectDir}</span><span class="prompt-branch"> (main)</span>$ <span class="term-cursor" aria-hidden="true">█</span>
+      </div>
+    `;
+  }
+
+  launcherBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = Number(btn.getAttribute('data-index'));
+      runMockCommand(idx);
+    });
+  });
+
+  if (termResetBtn) {
+    termResetBtn.addEventListener('click', () => {
+      runMockCommand(0);
+    });
+  }
+
+  // Initial radar activation
+  activateRadar(0);
+  if (launcherBtns[0]) launcherBtns[0].classList.add('active');
+</script>

@@ -1,0 +1,67 @@
+---
+// LanguageToggle.astro
+interface Props {
+  currentLang?: 'es' | 'en';
+}
+
+const { currentLang = 'es' } = Astro.props;
+const rawBase = import.meta.env.BASE_URL;
+const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+const targetHref = currentLang === 'es' ? `${baseUrl}en` : baseUrl;
+const targetLabel = currentLang === 'es' ? 'Switch to English' : 'Cambiar a Español';
+const targetBadge = currentLang === 'es' ? 'EN' : 'ES';
+---
+
+<a
+  href={targetHref}
+  class="lang-btn"
+  title={targetLabel}
+  aria-label={targetLabel}
+>
+  <!-- Modern Globe SVG icon -->
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="2" y1="12" x2="22" y2="12"></line>
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+  </svg>
+  <span class="lang-text">{targetBadge}</span>
+</a>
+
+<style>
+  .lang-btn {
+    all: unset;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    height: 2.5rem;
+    padding: 0 0.85rem;
+    border-radius: 0.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-medium);
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 0.825rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .lang-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .lang-btn:active {
+    transform: translateY(0);
+  }
+
+  .lang-text {
+    letter-spacing: 0.05em;
+  }
+</style>

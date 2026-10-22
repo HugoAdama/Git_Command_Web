@@ -1,0 +1,294 @@
+---
+// GitHooksHub.astro
+import { gitHooksEs } from '../data/gitToolsData';
+import { gitHooksEn } from '../data/en/gitToolsData';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const hooks = isEn ? gitHooksEn : gitHooksEs;
+
+const huskySetupScript = `# 1. Instalar Husky en tu proyecto moderno
+npx husky init
+
+# 2. Agregar hook de pre-commit para linter y secretos
+echo "npx lint-staged" > .husky/pre-commit
+
+# 3. Agregar hook para validar Conventional Commits
+echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg`;
+---
+
+<section id="seccion-hooks" class="hooks-section" aria-label={isEn ? "Git hooks and automation hub" : "Centro de automatización y hooks de Git"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-hooks">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg>
+      <span>{isEn ? 'Defensive Engineering' : 'Ingeniería Defensiva'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Git Hooks & Quality Automation Hub' : 'Automatizaciones con Git Hooks (Husky & Scripts)'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Prevent bugs, unformatted code, and leaked .env secrets before they ever touch your repository. Copy production-tested hook scripts.'
+        : 'Evita bugs, código desordenado y filtración de contraseñas antes de que lleguen a tu repositorio. Copia scripts de hooks probados en producción.'}
+    </p>
+  </div>
+
+  <div class="hooks-grid">
+    <!-- Hook Cards -->
+    {hooks.map((hook) => (
+      <article class="hook-card">
+        <div class="hook-card-top">
+          <div class="hook-badge-row">
+            <span class="hook-name-tag">{hook.name}</span>
+            <span class="hook-stage-tag">{hook.stage === 'client' ? (isEn ? 'Client-side' : 'Lado Cliente') : 'Server'}</span>
+          </div>
+          <h3 class="hook-purpose">{hook.purpose}</h3>
+          <p class="hook-desc">{hook.description}</p>
+        </div>
+
+        <div class="hook-script-box">
+          <div class="script-header">
+            <span class="script-path">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              {hook.filename}
+            </span>
+            <button
+              type="button"
+              class="copy-btn copy-btn-sm"
+              data-copy={hook.sampleScript}
+              aria-label={isEn ? `Copy script for ${hook.name}` : `Copiar script para ${hook.name}`}
+            >
+              <svg class="copy-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <svg class="check-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span class="btn-text">{isEn ? 'Copy' : 'Copiar'}</span>
+            </button>
+          </div>
+          <pre class="hook-code"><code>{hook.sampleScript}</code></pre>
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <!-- Modern Husky Setup Callout Card -->
+  <div class="husky-card">
+    <div class="husky-content">
+      <div class="husky-header">
+        <span class="husky-tag">{isEn ? 'Modern Workflow' : 'Flujo Moderno'}</span>
+        <h3 class="husky-title">{isEn ? 'Configure Automated Hooks with Husky' : 'Configuración Moderna con Husky en 3 Pasos'}</h3>
+        <p class="husky-desc">
+          {isEn
+            ? 'Rather than manually managing local .git/hooks (which are not tracked by Git), modern web teams use Husky to commit hook configurations directly to the repository.'
+            : 'En lugar de editar manualmente .git/hooks (que no se guardan en el repositorio), los equipos modernos usan Husky para compartir hooks con todo el equipo.'}
+        </p>
+      </div>
+
+      <div class="husky-code-box">
+        <div class="script-header">
+          <span class="script-path">Terminal (Node.js / NPM)</span>
+          <button
+            type="button"
+            class="copy-btn copy-btn-sm"
+            data-copy={huskySetupScript}
+            aria-label={isEn ? "Copy Husky setup commands" : "Copiar comandos de Husky"}
+          >
+            <svg class="copy-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <svg class="check-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span class="btn-text">{isEn ? 'Copy setup' : 'Copiar setup'}</span>
+          </button>
+        </div>
+        <pre class="hook-code"><code>{huskySetupScript}</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hooks-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-hooks {
+    color: var(--accent-emerald);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+  }
+
+  .hooks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .hook-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.25rem;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s;
+  }
+
+  .hook-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+
+  .hook-badge-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.65rem;
+  }
+
+  .hook-name-tag {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-emerald);
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+  }
+
+  .hook-stage-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .hook-purpose {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.35rem;
+  }
+
+  .hook-desc {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .hook-script-box {
+    background: #070b14;
+    border: 1px solid #1e293b;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  .script-header {
+    background: #0f172a;
+    padding: 0.45rem 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e293b;
+  }
+
+  .script-path {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  .hook-code {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.775rem;
+    line-height: 1.5;
+    color: #cbd5e1;
+    overflow-x: auto;
+    max-height: 240px;
+  }
+
+  /* Husky Setup Card */
+  .husky-card {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.7));
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 1.25rem;
+    padding: 1.75rem;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 20px -4px var(--glow-cyan);
+  }
+
+  .husky-content {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .husky-tag {
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 0.35rem;
+  }
+
+  .husky-title {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+  }
+
+  .husky-desc {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  .husky-code-box {
+    background: #070b14;
+    border: 1px solid #1e293b;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  @media (max-width: 860px) {
+    .husky-content {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hooks-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .hook-card {
+      padding: 1.25rem 1rem;
+    }
+
+    .husky-card {
+      padding: 1.25rem 1rem;
+    }
+  }
+</style>

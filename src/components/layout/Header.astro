@@ -1,0 +1,357 @@
+---
+// Header.astro
+import ThemeToggle from './ThemeToggle.astro';
+import LanguageToggle from './LanguageToggle.astro';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const rawBase = import.meta.env.BASE_URL;
+const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+const brandHref = isEn ? `${baseUrl}en` : baseUrl;
+---
+
+<header class="site-header">
+  <div class="top-bar">
+    <a href={brandHref} class="brand" title="Git Command Web">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="6" y1="3" x2="6" y2="15"></line>
+          <circle cx="18" cy="6" r="3"></circle>
+          <circle cx="6" cy="18" r="3"></circle>
+          <path d="M18 9a9 9 0 0 1-9 9"></path>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">Git Command Web</span>
+        <span class="brand-tag">{isEn ? 'Astro 7 Interactive Guide' : 'Guía Interactiva Astro 7'}</span>
+      </div>
+    </a>
+
+    <div class="header-actions">
+      <div class="legend-pills" aria-hidden="true">
+        <span class="pill pill-add">add</span>
+        <span class="pill-arrow">→</span>
+        <span class="pill pill-commit">commit</span>
+        <span class="pill-arrow">→</span>
+        <span class="pill pill-push">push</span>
+      </div>
+      <LanguageToggle currentLang={lang} />
+      <ThemeToggle />
+    </div>
+  </div>
+
+  <div class="hero-layout">
+    <div class="hero-content">
+      <div class="eyebrow">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span>{isEn ? 'Interactive Mental Model' : 'Flujo Mental Interactivo'}</span>
+      </div>
+      <h1 class="hero-title">
+        {isEn ? (
+          <>How your changes <span class="gradient-text">travel</span> in Git</>
+        ) : (
+          <>Por dónde <span class="gradient-text">viajan</span> tus cambios</>
+        )}
+      </h1>
+      <p class="hero-desc">
+        {isEn ? (
+          <>Git is not a black box: your files move across <strong>4 key stages</strong>. Click any pipeline arrow or module below to explore exact commands and how to master them.</>
+        ) : (
+          <>Git no es una caja negra: tus archivos se mueven a través de <strong>4 estados</strong> clave. Toca cualquier flecha del diagrama interactivo o categoría inferior para descubrir los comandos exactos y cómo usarlos.</>
+        )}
+      </p>
+    </div>
+
+    <!-- Hero Illustration Card with 3D Float and Neon Glow -->
+    <div class="hero-visual-card">
+      <div class="visual-frame">
+        <img
+          src={`${baseUrl}images/git-lifecycle-diagram.jpg`}
+          alt={isEn ? "Git Lifecycle 4-Stage Architecture Diagram" : "Diagrama Arquitectónico del Ciclo de Vida de Git en 4 Etapas"}
+          class="hero-img"
+          width="540"
+          height="304"
+          loading="eager"
+          decoding="async"
+        />
+        <div class="visual-glass-overlay">
+          <span class="visual-live-dot" aria-hidden="true"></span>
+          <span class="visual-badge-text">
+            {isEn ? 'Working Tree ➔ Staging ➔ Local Repo ➔ Cloud Remote' : 'Carpeta Local ➔ Staging ➔ Repo Local ➔ Servidor Remoto'}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    padding: 2.5rem 0 1.5rem;
+  }
+
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .brand-icon {
+    width: 2.6rem;
+    height: 2.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.65rem;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.2));
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 20px -3px var(--glow-cyan);
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+    color: var(--text-main);
+    line-height: 1.2;
+  }
+
+  .brand-tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent-gold);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .legend-pills {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 9999px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .pill {
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .pill-add {
+    background: rgba(16, 185, 129, 0.18);
+    color: var(--accent-emerald);
+  }
+
+  .pill-commit {
+    background: rgba(250, 204, 21, 0.18);
+    color: var(--accent-gold);
+  }
+
+  .pill-push {
+    background: rgba(56, 189, 248, 0.18);
+    color: var(--accent-cyan);
+  }
+
+  .pill-arrow {
+    color: var(--text-dim);
+    font-size: 0.7rem;
+  }
+
+  .hero-content {
+    max-width: 800px;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    padding: 0.3rem 0.8rem;
+    border-radius: 9999px;
+    margin-bottom: 1rem;
+  }
+
+  .pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--accent-emerald);
+    box-shadow: 0 0 10px var(--accent-emerald);
+    animation: pulse 2s infinite ease-in-out;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.3rem, 6vw, 4.2rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-gold) 60%, var(--accent-emerald) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-desc {
+    color: var(--text-muted);
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.6;
+    max-width: 62ch;
+  }
+
+  .hero-desc strong {
+    color: var(--text-main);
+  }
+
+  .hero-layout {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  .hero-visual-card {
+    position: relative;
+    border-radius: 1.25rem;
+    padding: 0.35rem;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(16, 185, 129, 0.15), rgba(168, 85, 247, 0.25));
+    box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6), 0 0 25px -5px var(--glow-cyan);
+    animation: heroFloat 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes heroFloat {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-6px); }
+  }
+
+  .visual-frame {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #070b14;
+    aspect-ratio: 16 / 9;
+  }
+
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hero-visual-card:hover .hero-img {
+    transform: scale(1.03);
+  }
+
+  .visual-glass-overlay {
+    position: absolute;
+    bottom: 0.65rem;
+    left: 0.65rem;
+    right: 0.65rem;
+    padding: 0.45rem 0.85rem;
+    background: rgba(7, 11, 20, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .visual-live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-emerald);
+    box-shadow: 0 0 8px var(--accent-emerald);
+    animation: pulse 1.8s infinite ease-in-out;
+    flex-shrink: 0;
+  }
+
+  .visual-badge-text {
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 960px) {
+    .hero-layout {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .legend-pills {
+      display: none;
+    }
+    .site-header {
+      padding: 1.5rem 0 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .brand-title {
+      font-size: 1rem;
+    }
+    .brand-tag {
+      font-size: 0.7rem;
+    }
+    .header-actions {
+      gap: 0.5rem;
+    }
+    .brand-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+  }
+</style>

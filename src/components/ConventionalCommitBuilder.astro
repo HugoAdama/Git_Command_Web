@@ -1,0 +1,368 @@
+---
+// ConventionalCommitBuilder.astro
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+---
+
+<section id="seccion-conventional-commits" class="commits-builder-section" aria-label={isEn ? "Semantic commit assistant" : "Asistente de commits semánticos"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-conventional">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <line x1="1.05" y1="12" x2="7" y2="12"></line>
+        <line x1="17.01" y1="12" x2="22.96" y2="12"></line>
+      </svg>
+      <span>{isEn ? 'Professional Standard' : 'Estándar Profesional'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Conventional Commits Assistant' : 'Asistente de Commits Semánticos (Conventional Commits)'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Learn to write clean, standardized messages following the Conventional Commits specification. Improves git log clarity and enables automated semantic releases and changelogs.'
+        : 'Aprende a redactar mensajes claros y profesionales según la especificación Conventional Commits. Mejora el historial de tu equipo y facilita la generación automática de versiones y changelogs.'}
+    </p>
+  </div>
+
+  <div class="commit-builder-card">
+    <div class="builder-inputs-grid">
+      <!-- Type Select -->
+      <div class="input-block">
+        <label for="commit-type-select">{isEn ? 'Change type (Type)' : 'Tipo de cambio (Type)'}</label>
+        <select id="commit-type-select" class="builder-select">
+          <option value="feat">feat — {isEn ? 'New feature for the user' : 'Nueva funcionalidad para el usuario'}</option>
+          <option value="fix">fix — {isEn ? 'Bug fix' : 'Corrección de un fallo o bug'}</option>
+          <option value="docs">docs — {isEn ? 'Documentation only changes' : 'Cambios exclusivos en la documentación'}</option>
+          <option value="style">style — {isEn ? 'Formatting, whitespace, commas without logic changes' : 'Formato, comas o espacios sin alterar lógica'}</option>
+          <option value="refactor">refactor — {isEn ? 'Code change that neither fixes a bug nor adds a feature' : 'Reestructuración de código sin nueva feature ni bugfix'}</option>
+          <option value="perf">perf — {isEn ? 'Performance improvement' : 'Optimización y mejora de rendimiento'}</option>
+          <option value="test">test — {isEn ? 'Adding or correcting automated tests' : 'Añadir o corregir pruebas automatizadas'}</option>
+          <option value="build">build — {isEn ? 'Build system or external dependencies' : 'Cambios en sistema de empaquetado o dependencias'}</option>
+          <option value="ci">ci — {isEn ? 'CI/CD configuration (GitHub Actions)' : 'Configuración de integración continua (GitHub Actions)'}</option>
+          <option value="chore">chore — {isEn ? 'Routine repository maintenance' : 'Tareas rutinarias de mantenimiento'}</option>
+        </select>
+      </div>
+
+      <!-- Scope Input -->
+      <div class="input-block">
+        <label for="commit-scope-input">{isEn ? 'Optional scope (Scope)' : 'Alcance opcional (Scope)'}</label>
+        <input
+          type="text"
+          id="commit-scope-input"
+          class="builder-input"
+          placeholder="e.g. auth, ui, api, nav, database"
+          value="auth"
+        />
+      </div>
+
+      <!-- Description Input -->
+      <div class="input-block full-width">
+        <label for="commit-desc-input">{isEn ? 'Concise imperative summary' : 'Descripción concisa en imperativo'}</label>
+        <input
+          type="text"
+          id="commit-desc-input"
+          class="builder-input"
+          placeholder={isEn ? "e.g. add secure password validation" : "ej. agregar validacion de contraseña segura"}
+          value={isEn ? "implement jwt token authentication" : "implementar autenticacion con tokens jwt"}
+        />
+      </div>
+
+      <!-- Breaking Change Checkbox -->
+      <div class="input-block full-width">
+        <label class="breaking-checkbox-label">
+          <input type="checkbox" id="commit-breaking-check" />
+          <span class="breaking-custom-box" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </span>
+          <span class="breaking-text">
+            <strong>{isEn ? 'Is this a Breaking Change?' : '¿Es un Breaking Change (Cambio disruptivo)?'}</strong>
+            <small>{isEn ? 'Introduces backward incompatibility (adds "!" modifier to commit type).' : 'Introduce incompatibilidades con versiones anteriores (agrega el modificador "!" en el commit).'}</small>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Output Box -->
+    <div class="commit-output-box">
+      <span class="output-label">{isEn ? 'Generated commit command:' : 'Comando de commit generado:'}</span>
+      <div class="output-code-line">
+        <span class="prompt-sym">$</span>
+        <code id="commit-preview-text" class="commit-code">{isEn ? 'git commit -m "feat(auth): implement jwt token authentication"' : 'git commit -m "feat(auth): implementar autenticacion con tokens jwt"'}</code>
+        <button
+          type="button"
+          id="copy-commit-btn"
+          class="copy-btn copy-btn-sm"
+          data-copy={isEn ? 'git commit -m "feat(auth): implement jwt token authentication"' : 'git commit -m "feat(auth): implementar autenticacion con tokens jwt"'}
+        >
+          <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <svg class="check-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span class="btn-text">{isEn ? 'Copy' : 'Copiar'}</span>
+        </button>
+      </div>
+
+      <div class="commit-formula-bar">
+        <span class="formula-pill pill-type" id="pill-type-label">feat</span>
+        <span class="formula-pill pill-scope" id="pill-scope-label">(auth)</span>
+        <span class="formula-colon">:</span>
+        <span class="formula-pill pill-desc" id="pill-desc-label">implementar autenticacion con tokens jwt</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .commits-builder-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-conventional {
+    color: var(--accent-emerald);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+  }
+
+  .commit-builder-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 2rem 1.75rem;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .builder-inputs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .input-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .input-block.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .input-block label {
+    font-family: var(--font-mono);
+    font-size: 0.775rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .builder-select,
+  .builder-input {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+    border-radius: 0.65rem;
+    padding: 0.6rem 0.85rem;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .builder-select:focus,
+  .builder-input:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+  }
+
+  /* Breaking Checkbox */
+  .breaking-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    background: rgba(244, 63, 94, 0.05);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+    border-radius: 0.65rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .breaking-checkbox-label input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .breaking-custom-box {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.2s;
+  }
+
+  .breaking-checkbox-label input:checked + .breaking-custom-box {
+    background: var(--accent-rose);
+    border-color: var(--accent-rose);
+    color: #ffffff;
+  }
+
+  .breaking-text strong {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--accent-rose);
+  }
+
+  .breaking-text small {
+    display: block;
+    font-size: 0.775rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+  }
+
+  /* Output Box */
+  .commit-output-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.85rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .output-label {
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .output-code-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0.6rem;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .commit-code {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent-emerald);
+    overflow-wrap: anywhere;
+  }
+
+  /* Formula Bar */
+  .commit-formula-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 0.775rem;
+    padding-top: 0.5rem;
+  }
+
+  .formula-pill {
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .pill-type {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .pill-scope {
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+  }
+
+  .formula-colon {
+    color: var(--text-dim);
+    font-weight: 700;
+  }
+
+  .pill-desc {
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 768px) {
+    .builder-inputs-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const typeSelect = document.getElementById('commit-type-select') as HTMLSelectElement | null;
+  const scopeInput = document.getElementById('commit-scope-input') as HTMLInputElement | null;
+  const descInput = document.getElementById('commit-desc-input') as HTMLInputElement | null;
+  const breakingCheck = document.getElementById('commit-breaking-check') as HTMLInputElement | null;
+
+  const previewText = document.getElementById('commit-preview-text');
+  const copyBtn = document.getElementById('copy-commit-btn');
+  const pillType = document.getElementById('pill-type-label');
+  const pillScope = document.getElementById('pill-scope-label');
+  const pillDesc = document.getElementById('pill-desc-label');
+
+  function updateCommitMessage() {
+    if (!typeSelect || !descInput || !previewText || !copyBtn) return;
+
+    const type = typeSelect.value;
+    const scope = scopeInput?.value.trim().toLowerCase() || '';
+    const desc = descInput.value.trim() || 'descripcion del cambio';
+    const isBreaking = breakingCheck?.checked;
+
+    const scopePart = scope ? `(${scope})` : '';
+    const breakingPart = isBreaking ? '!' : '';
+    const message = `${type}${scopePart}${breakingPart}: ${desc}`;
+    const fullCommand = `git commit -m "${message}"`;
+
+    previewText.textContent = fullCommand;
+    copyBtn.setAttribute('data-copy', fullCommand);
+
+    if (pillType) pillType.textContent = `${type}${breakingPart}`;
+    if (pillScope) {
+      pillScope.textContent = scopePart;
+      pillScope.style.display = scopePart ? 'inline-block' : 'none';
+    }
+    if (pillDesc) pillDesc.textContent = desc;
+  }
+
+  if (typeSelect && scopeInput && descInput && breakingCheck) {
+    typeSelect.addEventListener('change', updateCommitMessage);
+    scopeInput.addEventListener('input', updateCommitMessage);
+    descInput.addEventListener('input', updateCommitMessage);
+    breakingCheck.addEventListener('change', updateCommitMessage);
+  }
+
+  // Initial update
+  updateCommitMessage();
+</script>

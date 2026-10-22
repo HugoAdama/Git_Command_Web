@@ -1,0 +1,520 @@
+---
+// WorkflowsSection.astro
+import { gitWorkflows as gitWorkflowsEs } from '../data/gitEducationalData';
+import { gitWorkflowsDataEn } from '../data/en/gitEducationalData';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const workflows = isEn ? gitWorkflowsDataEn : gitWorkflowsEs;
+const rawBase = import.meta.env.BASE_URL;
+const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+---
+
+<section id="seccion-flujos" class="workflows-section" aria-label={isEn ? "Guided Git team workflows" : "Flujos de trabajo guiados de Git"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-workflow">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+      <span>{isEn ? 'Team Workflow Guides' : 'Guías de Trabajo en Equipo'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Step-by-Step Guided Workflows' : 'Flujos de Trabajo Guiados Paso a Paso'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Learn industry-standard procedures. Every step includes the exact terminal command and the mental model reasoning behind it.'
+        : 'Aprende los procedimientos estándar de la industria. Cada paso incluye el comando a ejecutar y la razón conceptual detrás de él.'}
+    </p>
+  </div>
+
+  <!-- Workflow Team Collaboration Banner -->
+  <div class="workflow-hero-banner">
+    <div class="wf-banner-info">
+      <span class="wf-banner-tag">{isEn ? 'Branching Strategy' : 'Estrategia de Ramas'}</span>
+      <h3 class="wf-banner-title">{isEn ? 'Parallel Feature Development & Clean Merges' : 'Desarrollo en Paralelo y Fusiones Limpias'}</h3>
+      <p class="wf-banner-desc">
+        {isEn
+          ? 'Modern engineering teams build features in short-lived branches. Isolate your work, collaborate via PRs, and merge cleanly into main.'
+          : 'Los equipos de ingeniería modernos crean funcionalidades en ramas cortas e independientes. Aísla tu código, colabora vía Pull Requests y fusiona limpiamente en main.'}
+      </p>
+    </div>
+    <div class="wf-banner-media">
+      <img
+        src={`${baseUrl}images/git-workflows-team.jpg`}
+        alt={isEn ? "Git Team Workflows and Branch Collaboration" : "Flujos de Trabajo en Equipo y Colaboración de Ramas en Git"}
+        class="wf-banner-img"
+        loading="lazy"
+        width="480"
+        height="270"
+      />
+    </div>
+  </div>
+
+  <!-- Workflow Selector Tabs -->
+  <div class="workflow-tabs" role="tablist" aria-label={isEn ? "Select guided workflow" : "Selecciona un flujo guiado"}>
+    {workflows.map((wf, idx) => (
+      <button
+        type="button"
+        class={`wf-tab-btn ${idx === 0 ? 'active' : ''}`}
+        data-wf-id={wf.id}
+        role="tab"
+        aria-selected={idx === 0 ? 'true' : 'false'}
+      >
+        <span class="wf-badge">{wf.badge}</span>
+        <span class="wf-title-text">{wf.title}</span>
+      </button>
+    ))}
+  </div>
+
+  <!-- Workflow Display Cards -->
+  <div class="workflows-container">
+    {workflows.map((wf, idx) => (
+      <div
+        class="workflow-card"
+        id={`wf-panel-${wf.id}`}
+        data-wf-target={wf.id}
+        hidden={idx !== 0}
+      >
+        <div class="wf-header">
+          <div class="wf-header-info">
+            <span class="wf-tag-pill">{wf.badge}</span>
+            <h3 class="wf-main-title">{wf.title}</h3>
+            <p class="wf-main-desc">{wf.description}</p>
+          </div>
+          <div class="wf-steps-counter">
+            <span class="counter-num">{wf.steps.length}</span>
+            <span class="counter-label">Pasos clave</span>
+          </div>
+        </div>
+
+        <div class="wf-stepper">
+          {wf.steps.map((st) => (
+            <div class="stepper-item">
+              <div class="stepper-left">
+                <div class="stepper-circle">
+                  <span>{st.stepNumber}</span>
+                </div>
+                <div class="stepper-line" aria-hidden="true"></div>
+              </div>
+
+              <div class="stepper-body">
+                <div class="stepper-top">
+                  <h4 class="stepper-title">{st.title}</h4>
+                  <p class="stepper-desc">{st.description}</p>
+                </div>
+
+                <div class="stepper-cmd-box">
+                  <span class="prompt-sym">$</span>
+                  <code class="stepper-cmd">{st.command}</code>
+                  <button
+                    type="button"
+                    class="copy-btn copy-btn-sm"
+                    data-copy={st.command}
+                    aria-label={`Copiar ${st.command}`}
+                  >
+                    <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <svg class="check-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span class="btn-text">Copiar</span>
+                  </button>
+                </div>
+
+                <div class="stepper-model-note">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span><strong>Modelo mental:</strong> {st.mentalModelNote}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .workflows-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-workflow {
+    color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
+
+  /* Workflow Hero Banner */
+  .workflow-hero-banner {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem 1.75rem;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.65));
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 1.25rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.45), 0 0 20px -3px rgba(56, 189, 248, 0.15);
+  }
+
+  .wf-banner-tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    margin-bottom: 0.4rem;
+  }
+
+  .wf-banner-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+  }
+
+  .wf-banner-desc {
+    color: var(--text-muted);
+    font-size: 0.925rem;
+    line-height: 1.55;
+  }
+
+  .wf-banner-media {
+    border-radius: 0.85rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-md);
+    aspect-ratio: 16 / 9;
+  }
+
+  .wf-banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .workflow-hero-banner:hover .wf-banner-img {
+    transform: scale(1.03);
+  }
+
+  @media (max-width: 860px) {
+    .workflow-hero-banner {
+      grid-template-columns: 1fr;
+      padding: 1.25rem;
+      gap: 1.25rem;
+    }
+  }
+
+  .workflow-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .wf-tab-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 1.15rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .wf-tab-btn:hover {
+    color: var(--text-main);
+    border-color: var(--border-medium);
+    transform: translateY(-1px);
+  }
+
+  .wf-tab-btn.active {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-cyan);
+    color: var(--text-main);
+    box-shadow: 0 0 20px -4px var(--glow-cyan);
+  }
+
+  .wf-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
+
+  /* Workflow Card */
+  .workflow-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 2rem 1.75rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  .workflow-card[hidden] {
+    display: none;
+  }
+
+  .wf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .wf-tag-pill {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .wf-main-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    color: var(--text-main);
+    margin: 0.25rem 0 0.5rem;
+    line-height: 1.2;
+  }
+
+  .wf-main-desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .wf-steps-counter {
+    text-align: center;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    padding: 0.65rem 1rem;
+    flex-shrink: 0;
+  }
+
+  .counter-num {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--accent-cyan);
+    line-height: 1;
+  }
+
+  .counter-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  /* Stepper */
+  .wf-stepper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stepper-item {
+    display: flex;
+    gap: 1.25rem;
+    position: relative;
+  }
+
+  .stepper-item:last-child .stepper-line {
+    display: none;
+  }
+
+  .stepper-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stepper-circle {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: rgba(56, 189, 248, 0.15);
+    border: 2px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+    flex-shrink: 0;
+    z-index: 2;
+  }
+
+  .stepper-line {
+    flex: 1;
+    width: 2px;
+    background: var(--border-medium);
+    margin: 0.5rem 0;
+  }
+
+  .stepper-body {
+    flex: 1;
+    padding-bottom: 2.25rem;
+    min-width: 0;
+  }
+
+  .stepper-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+  }
+
+  .stepper-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .stepper-cmd-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.65rem;
+    padding: 0.6rem 0.85rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .prompt-sym {
+    font-family: var(--font-mono);
+    color: var(--accent-emerald);
+    font-weight: 700;
+  }
+
+  .stepper-cmd {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    overflow-wrap: anywhere;
+  }
+
+  .stepper-model-note {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.825rem;
+    color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.75rem;
+  }
+
+  .stepper-model-note svg {
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 640px) {
+    .workflow-card {
+      padding: 1.25rem 1rem;
+    }
+
+    .wf-header {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .wf-tabs {
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-wrap: nowrap;
+      padding-bottom: 0.4rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .wf-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .wf-tab-btn {
+      flex: 0 0 auto;
+      font-size: 0.825rem;
+      padding: 0.45rem 0.85rem;
+    }
+
+    .stepper-item {
+      gap: 0.85rem;
+    }
+
+    .stepper-cmd-box {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.65rem;
+    }
+
+    .stepper-cmd-box .copy-btn {
+      align-self: flex-end;
+    }
+  }
+</style>
+
+<script>
+  const wfTabs = document.querySelectorAll<HTMLButtonElement>('.wf-tab-btn');
+  const wfCards = document.querySelectorAll<HTMLElement>('.workflow-card');
+
+  wfTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      wfTabs.forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+
+      const targetId = tab.getAttribute('data-wf-id');
+      wfCards.forEach(card => {
+        const matches = card.getAttribute('data-wf-target') === targetId;
+        card.hidden = !matches;
+      });
+    });
+  });
+</script>

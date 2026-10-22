@@ -1,0 +1,485 @@
+---
+// GitInternals.astro
+import { gitInternalsEs } from '../data/gitToolsData';
+import { gitInternalsEn } from '../data/en/gitToolsData';
+
+interface Props {
+  lang?: 'es' | 'en';
+}
+
+const { lang = 'es' } = Astro.props;
+const isEn = lang === 'en';
+const objects = isEn ? gitInternalsEn : gitInternalsEs;
+---
+
+<section id="seccion-internals" class="internals-section" aria-label={isEn ? "Git internals and object architecture" : "Arquitectura interna y objetos de Git"}>
+  <div class="section-title-wrap">
+    <div class="section-badge badge-internals">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+        <line x1="6" y1="6" x2="6.01" y2="6"></line>
+        <line x1="6" y1="18" x2="6.01" y2="18"></line>
+      </svg>
+      <span>{isEn ? 'Under The Hood' : 'Bajo el Capó'}</span>
+    </div>
+    <h2 class="section-heading">{isEn ? 'Git Object Anatomy & Plumbing Internals' : 'Anatomía de Objetos y Plomería Interna de Git'}</h2>
+    <p class="section-sub">
+      {isEn
+        ? 'Git is not magic—it is a simple cryptographic content-addressable directed acyclic graph (DAG). Discover how Blobs, Trees, Commits, and References work under the surface.'
+        : 'Git no es magia: es un grafo acíclico dirigido (DAG) direccionable por contenido. Descubre cómo interactúan Blobs, Trees, Commits y Referencias bajo la superficie.'}
+    </p>
+  </div>
+
+  <div class="internals-card" data-objects-json={JSON.stringify(objects)} data-lang={lang}>
+    <!-- Object Type Selector Pills -->
+    <div class="object-tabs-bar" role="tablist" aria-label={isEn ? "Git object types" : "Tipos de objetos de Git"}>
+      {objects.map((obj, idx) => (
+        <button
+          type="button"
+          class={`obj-tab-btn ${idx === 0 ? 'active' : ''}`}
+          data-type={obj.type}
+          data-index={idx}
+          role="tab"
+          aria-selected={idx === 0 ? 'true' : 'false'}
+        >
+          <span class="obj-dot" aria-hidden="true"></span>
+          <span class="obj-name">{obj.type.toUpperCase()}</span>
+          <small class="obj-label">{obj.title.split(' ')[0]}</small>
+        </button>
+      ))}
+    </div>
+
+    <!-- Interactive Inspector Workspace -->
+    <div class="inspector-grid">
+      <!-- Left: Conceptual Info & DAG Relationship -->
+      <div class="obj-details-panel">
+        <div class="obj-meta">
+          <span class="obj-badge" id="obj-type-badge">{objects[0].type.toUpperCase()}</span>
+          <h3 class="obj-title" id="obj-title">{objects[0].title}</h3>
+          <p class="obj-sub" id="obj-sub">{objects[0].subtitle}</p>
+        </div>
+
+        <p class="obj-desc" id="obj-desc">{objects[0].description}</p>
+
+        <!-- DAG Tree Relationship Diagram snippet -->
+        <div class="dag-visual-snippet">
+          <span class="dag-title">{isEn ? 'Object Graph Linkage (DAG):' : 'Relación en el Grafo (DAG):'}</span>
+          <div class="dag-flow-boxes">
+            <div class="dag-box dag-commit">
+              <strong>Commit</strong>
+              <small>f4a1209</small>
+            </div>
+            <span class="dag-arrow">➔</span>
+            <div class="dag-box dag-tree">
+              <strong>Tree (root)</strong>
+              <small>83ba6fc</small>
+            </div>
+            <span class="dag-arrow">➔</span>
+            <div class="dag-box dag-blob">
+              <strong>Blob</strong>
+              <small>70a34b2</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Demystifying Refs Callout -->
+        <div class="refs-callout">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <div>
+            <strong>{isEn ? 'Did you know?' : '¿Sabías que?'}</strong>
+            <span>
+              {isEn
+                ? 'A Git branch like main is simply a 41-byte plain text file inside .git/refs/heads/main containing the SHA-1 of the latest commit.'
+                : 'Una rama de Git como main es solo un archivo de texto plano de 41 bytes en .git/refs/heads/main que contiene el hash SHA-1 de su último commit.'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Live Plumbing Command Inspector Window -->
+      <div class="raw-inspector-panel">
+        <div class="inspector-window-header">
+          <div class="window-dots" aria-hidden="true">
+            <span class="dot dot-close"></span>
+            <span class="dot dot-minimize"></span>
+            <span class="dot dot-expand"></span>
+          </div>
+          <div class="command-executed">
+            <span class="sym">$</span>
+            <code id="inspector-command-text">{objects[0].plumbingCommand}</code>
+          </div>
+          <button
+            type="button"
+            class="copy-btn copy-btn-sm"
+            id="copy-plumbing-btn"
+            data-copy={objects[0].plumbingCommand}
+            aria-label={isEn ? "Copy plumbing command" : "Copiar comando de plomería"}
+          >
+            <svg class="copy-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <svg class="check-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </button>
+        </div>
+
+        <div class="hash-tag-row">
+          <span class="hash-label">SHA-1 / SHA-256 HASH:</span>
+          <code class="hash-val" id="inspector-hash-val">{objects[0].sampleHash}</code>
+        </div>
+
+        <div class="payload-container">
+          <span class="payload-label">{isEn ? 'Decompressed Object Payload:' : 'Contenido Descomprimido del Objeto:'}</span>
+          <pre class="raw-payload-code" id="inspector-payload-text"><code>{objects[0].rawPayload}</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .internals-section {
+    margin: 4.5rem 0 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .badge-internals {
+    color: var(--accent-purple);
+    background: rgba(168, 85, 247, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+  }
+
+  .internals-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 1.25rem;
+    padding: 1.75rem;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .object-tabs-bar {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 1.25rem;
+  }
+
+  .obj-tab-btn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 1.15rem;
+    border-radius: 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .obj-tab-btn:hover {
+    border-color: var(--border-medium);
+    transform: translateY(-1px);
+  }
+
+  .obj-tab-btn.active {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: var(--accent-purple);
+  }
+
+  .obj-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+  }
+
+  .obj-tab-btn.active .obj-dot {
+    background: var(--accent-purple);
+    box-shadow: 0 0 8px var(--accent-purple);
+  }
+
+  .obj-name {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .obj-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .inspector-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  /* Left Panel */
+  .obj-details-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .obj-badge {
+    font-family: var(--font-mono);
+    font-size: 0.725rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(168, 85, 247, 0.15);
+    color: var(--accent-purple);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    display: inline-block;
+    margin-bottom: 0.35rem;
+  }
+
+  .obj-title {
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .obj-sub {
+    font-size: 0.9rem;
+    color: var(--accent-cyan);
+    font-weight: 500;
+  }
+
+  .obj-desc {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .dag-visual-snippet {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .dag-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .dag-flow-boxes {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .dag-box {
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    font-family: var(--font-mono);
+  }
+
+  .dag-box strong { font-size: 0.775rem; }
+  .dag-box small { font-size: 0.7rem; opacity: 0.8; }
+
+  .dag-commit {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+  }
+
+  .dag-tree {
+    background: rgba(250, 204, 21, 0.12);
+    border: 1px solid var(--accent-gold);
+    color: var(--accent-gold);
+  }
+
+  .dag-blob {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid var(--accent-emerald);
+    color: var(--accent-emerald);
+  }
+
+  .dag-arrow {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+
+  .refs-callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: rgba(56, 189, 248, 0.05);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .refs-callout svg {
+    color: var(--accent-cyan);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .refs-callout strong {
+    color: var(--accent-cyan);
+    margin-right: 0.35rem;
+  }
+
+  /* Right Panel: Code Window */
+  .raw-inspector-panel {
+    background: #070b14;
+    border: 1px solid #1e293b;
+    border-radius: 0.85rem;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .inspector-window-header {
+    background: #0f172a;
+    padding: 0.65rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-bottom: 1px solid #1e293b;
+  }
+
+  .command-executed {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .command-executed .sym {
+    color: var(--accent-emerald);
+    font-weight: 700;
+  }
+
+  .command-executed code {
+    color: var(--accent-gold);
+    font-weight: 600;
+  }
+
+  .hash-tag-row {
+    background: rgba(15, 23, 42, 0.6);
+    border-bottom: 1px solid #1e293b;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .hash-label {
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    font-weight: 700;
+  }
+
+  .hash-val {
+    color: var(--accent-purple);
+    font-weight: 600;
+    word-break: break-all;
+  }
+
+  .payload-container {
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .payload-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .raw-payload-code {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.825rem;
+    line-height: 1.55;
+    color: #e2e8f0;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  @media (max-width: 960px) {
+    .inspector-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import type { GitInternalObject } from '../data/gitToolsData';
+
+  const card = document.querySelector<HTMLElement>('.internals-card');
+  const objectsData: GitInternalObject[] = card?.dataset.objectsJson ? JSON.parse(card.dataset.objectsJson) : [];
+
+  const tabBtns = document.querySelectorAll<HTMLButtonElement>('.obj-tab-btn');
+  const typeBadge = document.getElementById('obj-type-badge');
+  const titleEl = document.getElementById('obj-title');
+  const subEl = document.getElementById('obj-sub');
+  const descEl = document.getElementById('obj-desc');
+  const cmdText = document.getElementById('inspector-command-text');
+  const hashVal = document.getElementById('inspector-hash-val');
+  const payloadText = document.getElementById('inspector-payload-text');
+  const copyBtn = document.getElementById('copy-plumbing-btn');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+
+      const idx = Number(btn.getAttribute('data-index') || 0);
+      const data = objectsData[idx];
+      if (!data) return;
+
+      if (typeBadge) typeBadge.textContent = data.type.toUpperCase();
+      if (titleEl) titleEl.textContent = data.title;
+      if (subEl) subEl.textContent = data.subtitle;
+      if (descEl) descEl.textContent = data.description;
+      if (cmdText) cmdText.textContent = data.plumbingCommand;
+      if (hashVal) hashVal.textContent = data.sampleHash;
+      if (payloadText) payloadText.textContent = data.rawPayload;
+      if (copyBtn) copyBtn.setAttribute('data-copy', data.plumbingCommand);
+    });
+  });
+</script>
